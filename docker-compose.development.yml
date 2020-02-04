@@ -11,3 +11,9 @@ services:
     volumes:
       - .:/opt/app-root/src:z
       - /opt/app-root/src/node_modules
+  npm:
+    image: mlaas-ui_server
+    volumes:
+      - .:/opt/app-root/src:z
+    entrypoint:
+      - npm
