@@ -1,0 +1,13 @@
+# This file should be used when using docker-compose for local development
+# method 1: export COMPOSE_FILE='docker-compose.yml:docker-compose.development.yml'
+# method 2: ln -s docker-compose.development.yml docker-compose.override.yml
+#
+# Note: after setting this environment variable, DO NOT run docker-compose up -d
+# without specifying the exact services that you want running in the background,
+# e.g. docker-compose up -d server db
+version: '3'
+services:
+  server:
+    volumes:
+      - .:/opt/app-root/src:z
+      - /opt/app-root/src/node_modules
