@@ -14,7 +14,7 @@ LABEL git_repository_url=${CI_PROJECT_URL}
 ENV APP_HOME=/opt/app-root/src
 
 WORKDIR /tmp
-RUN yum install -y readline-devel gcc gcc-c++ make zlib-devel xz openssl openssl-devel git patch \
+RUN yum install -y findutils readline-devel gcc gcc-c++ make zlib-devel xz openssl openssl-devel git patch \
     && curl -L https://nodejs.org/dist/${NODEJS_VERSION}/node-${NODEJS_VERSION}-linux-x64.tar.xz > node-${NODEJS_VERSION}-linux-x64.tar.xz \
     && tar -Jxvf node-${NODEJS_VERSION}-linux-x64.tar.xz \
     && cd node-${NODEJS_VERSION}-linux-x64 \
