@@ -55,7 +55,7 @@ const authHelper = {
                 if(this.accessCodeExists()) {
                     authClient.authenticate(
                         this.accessCode,
-                        window.location.origin+'/login',
+                        window.location.origin,
                         (jwtToken, username, expiration, timeToLive) => {
                             sessionStorage.setItem(jwtStoreKey, jwtToken);
                             sessionStorage.setItem(jwtExpirationStoreKey, Date.now() + timeToLive);
@@ -72,7 +72,7 @@ const authHelper = {
                     );
                 }
                 else {
-                    var dukeOauthUrl = `${config['oauth_base_uri']}/authorize?response_type=code&client_id=${config['oauth_client_id']}&state=login&redirect_uri=`+window.location.origin+'/login'
+                    var dukeOauthUrl = `${config['oauth_base_uri']}/authorize?response_type=code&client_id=${config['oauth_client_id']}&state=login&redirect_uri=`+window.location.origin;
                     window.location.assign(dukeOauthUrl);
                     resolve(true);
                 }

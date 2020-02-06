@@ -150,7 +150,7 @@ describe('authHelper', () => {
     var isLoggedIn = false;
     const { location } = window;
     const mockLocation = location.href;
-    const mockedOauthRedirectUrl = `${config['oauth_base_uri']}/authorize?response_type=code&client_id=${config['oauth_client_id']}&state=login&redirect_uri=`+mockLocation+'/login';
+    const mockedOauthRedirectUrl = `${config['oauth_base_uri']}/authorize?response_type=code&client_id=${config['oauth_client_id']}&state=login&redirect_uri=`+mockLocation;
     const jwtToken = 'abc123xyz';
     const expiration = 'future';
     const username = 'sheila'
