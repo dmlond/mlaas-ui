@@ -5,7 +5,21 @@ services:
     command:
       - npm
       - start
-    environment:
-      - NODE_ENV=development
+    env_file:
+      - server.env
+    depends_on:
+      - auth
     ports:
     - 3001:3000
+  auth:
+    image: auth-service_server
+    env_file:
+      - auth.env
+      - oauth.env
+    command:
+      - puma
+    links:
+      - redis:redis.host
+  redis:
+    image: redis:latest
+    hostname: redis.host
