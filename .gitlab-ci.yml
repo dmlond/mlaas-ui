@@ -1,0 +1,76 @@
+stages:
+  - build
+  - test
+  - scan
+  - publish
+
+variables:
+  LOG_LEVEL: "info"
+
+include:
+  - project: 'utility/project-templates/ci-templates'
+    file: '/docker.yml'
+  - project: 'utility/images/auto-version'
+    file: '/auto-version.yml'
+  - project: 'ori-rad/ci-pipeline-utilities/deployment'
+    file: '/deployment.yml'
+
+build:
+  stage: build
+  script:
+    - docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
+    - docker build --build-arg CI_COMMIT_SHA=${CI_COMMIT_SHA} --build-arg CI_PROJECT_URL=${CI_PROJECT_URL} --pull -t "${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}" .
+    - docker push "${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}"
+  tags:
+    - shell-executor
+  only:
+    refs:
+      - branches
+    variables:
+      - $HELM_TOKEN
+
+# By default, gitlab ci clones your code out into a build directory
+# that needs to then be initialized with bundler.
+# Since we are testing a candidate image that already has the required gems
+# installed with bundle install, we do not need to clone into the build directory.
+# Instead, we need to change into the APP_PATH for the image before we run the
+# tests
+jest:
+  stage: test
+  image: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - cd ${APP_HOME}
+    - npm test
+  only:
+    refs:
+      - branches
+    variables:
+      - $HELM_TOKEN
+  tags:
+    - docker
+
+scan:
+  stage: scan
+  before_script:
+    - export THE_IMAGE="${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}"
+    - export THE_DOCKERFILE="Dockerfile"
+  extends: .docker_scan
+  only:
+    refs:
+      - master
+      - tags
+    variables:
+    - $HELM_TOKEN
+
+# this only runs on master
+# it automatically generates the next semantic verson and creates an annotated tag
+increment_version:
+  extends: .auto_version
+  stage: publish
+  only:
+    refs:
+      - master
+    variables:
+      - $HELM_TOKEN
