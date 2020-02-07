@@ -11,7 +11,8 @@ const authClient = {
     },
 
     authenticate(code, redirect_uri, handleAuthentication, handleAuthenticationFailure) {
-        var authUrl = `${config['auth_service_base_url']}${config['auth_service_endpoint']}`
+        var authUrl = `${config.auth_service_base_uri}${config.auth_service_endpoint}`
+        console.log("sending post to "+authUrl);
         this.send(
             {
                 url: authUrl,
