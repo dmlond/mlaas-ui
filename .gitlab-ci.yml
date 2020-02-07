@@ -17,7 +17,7 @@ include:
 
 build:
   stage: build
-  script:
+  before_script:
     - export THE_DOCKERFILE='Dockerfile'
     - export THE_IMAGE="${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}"
     - export BUILD_ARGS="--build-arg CI_COMMIT_SHA=${CI_COMMIT_SHA} --build-arg CI_PROJECT_URL=${CI_PROJECT_URL}"
