@@ -149,8 +149,9 @@ describe('authHelper', () => {
     const origIsLoggedInF = authHelper.isLoggedIn;
     var isLoggedIn = false;
     const { location } = window;
-    const mockLocation = location.href;
-    const mockedOauthRedirectUrl = `${config['oauth_base_uri']}/authorize?response_type=code&client_id=${config['oauth_client_id']}&state=login&redirect_uri=`+mockLocation;
+    const mockPath = location.pathname;
+    const mockLocation = location.origin+location.pathname;
+    const mockedOauthRedirectUrl = `${config.oauth_base_uri}/authorize?response_type=code&client_id=${config.oauth_client_id}&state=login&redirect_uri=`+mockLocation;
     const jwtToken = 'abc123xyz';
     const expiration = 'future';
     const username = 'sheila'
@@ -165,6 +166,7 @@ describe('authHelper', () => {
       //https://remarkablemark.org/blog/2018/11/17/mock-window-location/
       window.location = { 
         origin: mockLocation,
+        pathname: mockPath,
         href: mockLocation,
         assign: jest.fn(),
         replace: jest.fn()
@@ -193,7 +195,9 @@ describe('authHelper', () => {
 
     describe('not already logged in', () => {
       const origCodeExistsF = authHelper.accessCodeExists;
+      const origGetOauthCodeFromURIF = authHelper.getOauthCodeFromURI;
       const origAuthClientAuthenticateF = authClient.authenticate;
+      var expectedCode;
       var codeExists;
       var jwtIsValid;
       const invalidTokenMessage = "token invalid";
@@ -205,6 +209,10 @@ describe('authHelper', () => {
           return codeExists;
         });
 
+        authHelper.getOauthCodeFromURI = jest.fn();
+        authHelper.getOauthCodeFromURI.mockImplementation(() => {
+          return expectedCode;
+        });
         authClient.authenticate = jest.fn();
         authClient.authenticate.mockImplementation(
           (c,r,s,f) => {
@@ -218,9 +226,11 @@ describe('authHelper', () => {
       });
       afterEach(() => {
         authHelper.accessCodeExists = origCodeExistsF;
+        authHelper.getOauthCodeFromURI = origGetOauthCodeFromURIF;
         authClient.authenticate = origAuthClientAuthenticateF;
       });
-      describe('access token exists', () => {
+      describe('access code exists', () => {
+        expectedCode = 'abc123xyz';
         beforeEach(() => {
           codeExists = true;
         });
@@ -242,6 +252,12 @@ describe('authHelper', () => {
               expect(handleSuccess).toBeCalledWith(
                 true
               );
+              expect(authClient.authenticate).toBeCalledWith(
+                expectedCode,
+                window.location.origin+window.location.pathname,
+                expect.anything(),
+                expect.anything()
+              )
               done();
             });
           });
@@ -276,7 +292,8 @@ describe('authHelper', () => {
           });
         });
       });
-      describe('access token does not exist', () => {
+      describe('access code does not exist', () => {
+        expectedCode = undefined;
         beforeEach(() => {
           codeExists = false;
         });

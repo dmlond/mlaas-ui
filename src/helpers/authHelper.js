@@ -35,8 +35,7 @@ const authHelper = {
     },
 
     accessCodeExists() {
-        this.accessCode = this.getOauthCodeFromURI();
-        return this.accessCode != null;
+        return window.location.href.indexOf("?code") > 0;
     },
     
     getOauthCodeFromURI() {
@@ -54,15 +53,15 @@ const authHelper = {
             else {
                 if(this.accessCodeExists()) {
                     authClient.authenticate(
-                        this.accessCode,
-                        window.location.origin,
+                        this.getOauthCodeFromURI(),
+                        window.location.origin+window.location.pathname,
                         (jwtToken, username, expiration, timeToLive) => {
                             sessionStorage.setItem(jwtStoreKey, jwtToken);
                             sessionStorage.setItem(jwtExpirationStoreKey, Date.now() + timeToLive);
                             sessionStorage.setItem(currentUserStoreKey, username);
                             window.location.replace("?");
                             if (typeof window.history.replaceState == 'function') {
-                                history.replaceState({}, '', window.location.href);
+                                window.history.replaceState({}, '', window.location.href);
                             }
                             resolve(true);
                         },
