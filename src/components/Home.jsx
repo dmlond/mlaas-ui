@@ -2,10 +2,39 @@ import React, { Component } from 'react';
 import authHelper from '../helpers/authHelper';
 
 class Home extends Component {
+    constructor(props) {
+      super(props);
+      this.handleAuthenticationSuccess = this.handleAuthenticationSuccess.bind(this);
+      this.handleException = this.handleException.bind(this);
+      this.state = {
+        hasError: false
+      };
+    }
+
+    componentDidMount() {
+      if (authHelper.accessCodeExists()) {
+        authHelper.login().then(
+          this.handleAuthenticationSuccess,
+          this.handleException
+        );
+      }
+    }
+
+    handleAuthenticationSuccess(isSuccessful) {
+      //nothing to do
+    }
+
+    handleException(errorMessage) {
+      this.setState({
+        hasError: true,
+        errorMessage: errorMessage});
+    }
+
     render() {
+      var renderBody;
+
       if (authHelper.isLoggedIn()) {
-        return (
-          <div className="App">
+        renderBody = <div className="App">
             <header className="App-header">
               <p>
                 Edit <code>src/App.js</code> and save to reload.
@@ -19,20 +48,31 @@ class Home extends Component {
                 Learn React
               </a>
             </header>
-          </div>  
-        )
+          </div>
       }
       else {
-        return (
-          <div className="App">
-            <header className="App-header">
-              <p>
-                This is the Machine Learning Service @ Duke
-              </p>
-            </header>
-          </div>
-        )
+        if (this.state.hasError) {
+          renderBody = <div className="App">
+                <header className="App-header">
+                  <p>
+                    Problem Logging In { this.state.errorMessage }
+                  </p>
+                </header>
+              </div>
+        }
+        else {
+          renderBody = <div className="App">
+              <header className="App-header">
+                <p>
+                  Welcome to Machine Learning @ Duke
+                </p>
+              </header>
+            </div>
+        }
       }
+      return (
+        renderBody
+      )
     }
 }
 

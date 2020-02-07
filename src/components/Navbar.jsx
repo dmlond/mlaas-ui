@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import config from "../config/authconfig.js";
 import authHelper from '../helpers/authHelper';
 import {Link} from "react-router-dom";
 
@@ -12,9 +13,10 @@ class Navbar extends Component {
             )
         }
         else {
+            const authUrl = `${config.oauth_base_uri}/authorize?response_type=code&client_id=${config.oauth_client_id}&state=login&redirect_uri=`+window.location.href
             return (
                 <div>
-                    <Link to="/login">Login </Link>
+                    <a href={ authUrl }>Login </a>
                 </div>
             )
         }
