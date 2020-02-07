@@ -20,6 +20,8 @@ services:
       - puma
     links:
       - redis:redis.host
+    ports:
+      - 3000:3000
   redis:
     image: redis:latest
     hostname: redis.host
