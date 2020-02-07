@@ -26,7 +26,6 @@ RUN yum install -y findutils readline-devel gcc gcc-c++ make zlib-devel xz opens
 
 WORKDIR ${APP_HOME}
 ENV PATH /${APP_HOME}/node_modules/.bin:$PATH
-COPY package.json /${APP_HOME}/package.json
+COPY . ${APP_HOME}
 RUN npm install \
     && npm install react-scripts
-
