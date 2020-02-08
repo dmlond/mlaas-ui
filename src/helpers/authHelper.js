@@ -8,7 +8,8 @@ const currentUserStoreKey = "current-user"
 const authHelper = {
     isLoggedIn() {
         if(this.jwt() && this.jwtExpiration()) {
-            if(parseInt(this.jwtExpiration()) >= Date.now()) {
+            const now = new Date();
+            if(parseInt(this.jwtExpiration()) >= Math.round(now.getTime() / 1000)) {
                 return true;
             }
             else {
@@ -57,7 +58,8 @@ const authHelper = {
                         window.location.origin+window.location.pathname,
                         (jwtToken, username, expiration, timeToLive) => {
                             sessionStorage.setItem(jwtStoreKey, jwtToken);
-                            sessionStorage.setItem(jwtExpirationStoreKey, Date.now() + timeToLive);
+                            const now = new Date();
+                            sessionStorage.setItem(jwtExpirationStoreKey, Math.round(now.getTime() / 1000) + parseInt(timeToLive));
                             sessionStorage.setItem(currentUserStoreKey, username);
                             window.location.replace("?");
                             if (typeof window.history.replaceState == 'function') {

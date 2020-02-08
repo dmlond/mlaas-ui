@@ -79,14 +79,16 @@ describe('authHelper', () => {
     describe('sessionStore contains auth-token and auth-token-expiration', () => {
       describe('token is expired', () => {
         it('should return false', () => {
-          expectedJwtExpiration = Date.now() - 1000;
+          const now = new Date();
+          const nowSeconds = Math.round(now.getTime() / 1000)
+          expectedJwtExpiration = nowSeconds - 1000;
           sessionStorage.setItem(expectedJwtStoreKey, expectedJwt);
           sessionStorage.setItem(expectedJwtExpirationStoreKey, expectedJwtExpiration);
           let storedToken = sessionStorage.getItem(expectedJwtStoreKey);
           let storedTokenExpiration = parseInt(sessionStorage.getItem(expectedJwtExpirationStoreKey));
           expect(storedToken).toEqual(expectedJwt);
           expect(storedTokenExpiration).toEqual(expectedJwtExpiration);
-          expect(storedTokenExpiration).toBeLessThan(Date.now());
+          expect(storedTokenExpiration).toBeLessThan(nowSeconds);
           expect(authHelper.isLoggedIn()).toBeFalsy();
           expect(sessionStorage.getItem(expectedJwtStoreKey)).toBeNull();
           expect(sessionStorage.getItem(expectedJwtExpirationStoreKey)).toBeNull();
