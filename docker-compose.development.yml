@@ -17,3 +17,12 @@ services:
       - .:/opt/app-root/src:z
     entrypoint:
       - npm
+  jest:
+    image: mlaas-ui_server
+    volumes:
+      - .:/opt/app-root/src:z
+    environment:
+      - CI=1
+    entrypoint:
+      - npm
+      - test
