@@ -1,8 +1,9 @@
 stages:
   - build
   - test
-  - scan
   - publish
+  - build_deployment
+  - scan_deployment
 
 variables:
   LOG_LEVEL: "info"
@@ -51,19 +52,6 @@ jest:
   tags:
     - docker
 
-scan:
-  stage: scan
-  before_script:
-    - export THE_IMAGE="${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}"
-    - export THE_DOCKERFILE="Dockerfile"
-  extends: .docker_scan
-  only:
-    refs:
-      - master
-      - tags
-    variables:
-    - $HELM_TOKEN
-
 # this only runs on master
 # it automatically generates the next semantic verson and creates an annotated tag
 increment_version:
@@ -74,3 +62,36 @@ increment_version:
       - master
     variables:
       - $HELM_TOKEN
+
+build_development_deployment:
+  stage: build_deployment
+  before_script:
+    - export THE_DOCKERFILE="Dockerfile-deployment"
+    - export THE_IMAGE="${CI_REGISTRY_IMAGE}/deployment/${CI_ENVIRONMENT_NAME}:${CI_COMMIT_SHORT_SHA}"
+    - export REACT_APP_AUTH_SERVICE_BASE_URI="${CI_ENVIRONMENT_NAME}-auth-service.ocp.dhe.duke.edu"
+    - export BUILD_ARGS="--build-arg REACT_APP_OAUTH_CLIENT_ID=${REACT_APP_OAUTH_CLIENT_ID} --build-arg REACT_APP_OAUTH_BASE_URI=${REACT_APP_OAUTH_BASE_URI} --build-arg REACT_APP_AUTH_SERVICE_BASE_URI=${REACT_APP_AUTH_SERVICE_BASE_URI} --build-arg REACT_APP_AUTH_SERVICE_AUTHENTICATION_ENDPOINT=${REACT_APP_AUTH_SERVICE_AUTHENTICATION_ENDPOINT}"
+  extends: .kaniko_build
+  environment:
+    name: development
+  only:
+    refs:
+      - /^v[0-9]+\.[0-9]+\.[0-9]+$/
+    variables:
+      - $HELM_TOKEN
+  except:
+    - branches    
+
+scan_development_deployment:
+  stage: scan_deployment
+  before_script:
+    - export THE_IMAGE="${CI_REGISTRY_IMAGE}/deployment/${CI_ENVIRONMENT_NAME}:${CI_COMMIT_SHORT_SHA}"
+  extends: .docker_scan
+  environment:
+    name: development
+  only:
+    refs:
+      - /^v[0-9]+\.[0-9]+\.[0-9]+$/
+    variables:
+    - $HELM_TOKEN
+  except:
+    - branches
