@@ -20,4 +20,7 @@ RUN npm run build
 
 FROM centos/httpd-24-centos7
 
+# twistlock
+RUN yum update -y sqlite
+
 COPY --from=builder /opt/app-root/src/build /var/www/html
