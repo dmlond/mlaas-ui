@@ -35,38 +35,24 @@ class Home extends Component {
 
       if (authHelper.isLoggedIn()) {
         renderBody = <div className="App">
-            <header className="App-header">
-              <p>
-                Edit <code>src/App.js</code> and save to reload.
-              </p>
-              <a
-                className="App-link"
-                href="https://reactjs.org"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Learn React
-              </a>
-            </header>
-          </div>
+            <p>
+              Welcome to ML@Duke!
+            </p>
+        </div>
       }
       else {
         if (this.state.hasError) {
           renderBody = <div className="App">
-                <header className="App-header">
                   <p>
                     Problem Logging In { this.state.errorMessage }
                   </p>
-                </header>
               </div>
         }
         else {
           renderBody = <div className="App">
-              <header className="App-header">
                 <p>
-                  Welcome to Machine Learning @ Duke
+                  This is the Machine Learning @ Duke System. Please login to continue.
                 </p>
-              </header>
             </div>
         }
       }

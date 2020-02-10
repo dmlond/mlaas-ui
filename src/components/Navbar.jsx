@@ -2,13 +2,50 @@ import React, { Component } from 'react';
 import config from "../config/authconfig.js";
 import authHelper from '../helpers/authHelper';
 import {Link} from "react-router-dom";
+import { AppHeader, Dropdown, IconMenu, ActionButton, IconLogout } from "@duke-office-research-informatics/dracs";
 
 class Navbar extends Component {
+    handleLogout() {
+        authHelper.logout();
+    }
     render() {
         if (authHelper.isLoggedIn()){
             return (
             <div>
-                <Link to="/">Home </Link>
+                <AppHeader
+                    width="calc(100% - 32px)"
+                    backgroundColor="rgba(74,144,226,1)"
+                    childrenLeft={<Link to="/">Home </Link>}
+                    childrenRight={
+                        <Dropdown
+                              buttonLabel={<IconMenu />}
+                              menuPosition="right"
+                              label="Actions"
+                              type="button"
+                              onBlur={null}
+                              onItemBlur={null}
+                              onClick={null}
+                              onItemClick={null}
+                              onFocus={null}
+                              onItemFocus={null}
+                              onMouseDown={null}
+                              onMouseEnter={null}
+                              onMouseLeave={null}
+                              onMouseUp={null}
+                              onTouchStart={null}
+                              onTouchEnd={null}
+                            >
+                                <p>
+                                    { authHelper.currentUser() }
+                                </p>
+                                <ActionButton
+                                    onClick={this.handleLogout}
+                                >   
+                                    <IconLogout /><p>Logout</p>
+                                </ActionButton>
+                            </Dropdown>
+                        } 
+                />
             </div>
             )
         }
@@ -16,7 +53,9 @@ class Navbar extends Component {
             const authUrl = `${config.oauth_base_uri}/authorize?response_type=code&client_id=${config.oauth_client_id}&state=login&redirect_uri=`+window.location.href
             return (
                 <div>
-                    <a href={ authUrl }>Login </a>
+                    <AppHeader 
+                        childrenLeft={<a href={ authUrl }>Login </a>}
+                    />
                 </div>
             )
         }

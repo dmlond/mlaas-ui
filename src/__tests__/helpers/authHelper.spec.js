@@ -73,6 +73,7 @@ describe('authHelper', () => {
         expect(sessionStorage.getItem(expectedJwtStoreKey)).toBeNull();
         expect(sessionStorage.getItem(expectedJwtExpirationStoreKey)).toBeNull();
         expect(authHelper.isLoggedIn()).toBeFalsy();
+        expect(sessionStorage.clear).toHaveBeenCalled();
       });
     });
 
@@ -314,6 +315,25 @@ describe('authHelper', () => {
           });
         });
       });
+    });
+  });
+
+  describe('.logout', () => {
+    const { location } = window;
+    beforeEach(() => {
+      //https://remarkablemark.org/blog/2018/11/17/mock-window-location/
+      delete window.location;
+      window.location = { 
+        assign: jest.fn()
+      };
+    });
+    afterEach(() => {
+      window.locaton = location;
+    });
+    it('should clear the session and redirect to /', () => {
+      authHelper.logout();
+      expect(sessionStorage.clear).toHaveBeenCalled();
+      expect(window.location.assign).toHaveBeenCalledWith('/');
     });
   });
 });
