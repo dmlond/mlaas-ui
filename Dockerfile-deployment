@@ -20,7 +20,12 @@ RUN npm run build
 
 FROM centos/httpd-24-centos7
 
+USER root
 # twistlock
 RUN yum update -y sqlite
-
 COPY --from=builder /opt/app-root/src/build /var/www/html
+# required in openshift
+RUN chgrp -R root /var/www/html \
+      && chmod -R g=rwx /var/www/html
+
+USER 1001
