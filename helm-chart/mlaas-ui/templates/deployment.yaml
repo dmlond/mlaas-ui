@@ -1,0 +1,41 @@
+{{- $imageRepository := required "image.repository is required!" .Values.image.repository -}}
+{{- $imageTag := required "image.tag is required!" .Values.image.tag }}
+{{- $environment := required "environment is required!" .Values.environment -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mlaas-ui.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "auth-service.fullname" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app: "{{.Chart.Name}}"
+    environment: "{{ $environment }}"
+    git_commit: "{{ .Values.git_commit }}"
+    git_ref: "{{ .Values.git_ref }}"
+    ci_job_id: "{{ .Values.ci_job_id }}"
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "auth-service.fullname" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "auth-service.fullname" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      imagePullSecrets:
+        - name: {{ include "auth-service.fullname" . }}-pull
+      containers:
+        - name: {{ include "auth-service.fullname" . }}
+          image: "{{ $imageRepository }}:{{ $imageTag }}"
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http

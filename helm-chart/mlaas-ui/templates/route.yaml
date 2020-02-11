@@ -1,0 +1,26 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ include "mlaas-ui.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "mlaas-ui.fullname" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app: "{{ .Chart.Name }}"
+    environment: "{{ .Values.environment }}"
+spec:
+  {{- if .Values.url }}
+  host: {{ .Values.url | replace "https://" "" }}
+  {{- end }}
+  port:
+    targetPort: http
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: edge
+  to:
+    kind: Service
+    name: {{ include "mlaas-ui.fullname" . }}
+    weight: 100
+  wildcardPolicy: None
+status:
+  ingress:
+    - wildcardPolicy: None
