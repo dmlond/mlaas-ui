@@ -131,7 +131,7 @@ decommission_development:
     name: development
     action: stop
   script:
-    - echo "deleting mlaas-${CI_ENVIRONMENT_NAME}-auth-service"
+    - echo "deleting mlaas-${CI_ENVIRONMENT_NAME}-mlass-ui"
     - source /usr/local/bin/deploy
     - check_required_cluster_login_environment
     - cluster_login
