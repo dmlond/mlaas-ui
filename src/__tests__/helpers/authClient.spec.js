@@ -47,7 +47,7 @@ describe('authClient', () => {
 
     function testAuthServiceApi(expectedSendPath, expectedSendMethod, sendCall, extraPayload, ...sendArguments) {
         describe('expected Auth Service API interaction', () => {
-            let expectedApiSendUrl = `${process.env.REACT_APP_AUTH_SERVICE_BASE_URI}${expectedSendPath}`;
+            let expectedApiSendUrl = `${process.env.REACT_APP_PROXY_URI}${expectedSendPath}`;
 
             spyAuthClientSend();
 

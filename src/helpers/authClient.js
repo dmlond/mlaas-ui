@@ -11,7 +11,7 @@ const authClient = {
     },
 
     authenticate(code, redirect_uri, handleAuthentication, handleAuthenticationFailure) {
-        var authUrl = `${config.auth_service_base_uri}${config.auth_service_endpoint}`
+        var authUrl = `${config.proxy_uri}${config.auth_service_endpoint}`
         this.send(
             {
                 url: authUrl,
