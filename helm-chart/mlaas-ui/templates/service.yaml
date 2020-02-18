@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: {{ include "mlaas-ui.fullname" . }}
   labels:
-    app.kubernetes.io/name: {{ include "auth-service.fullname" . }}
+    app.kubernetes.io/name: {{ include "mlaas-ui.fullname" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app: "{{ .Chart.Name }}"
     environment: "{{ .Values.environment }}"
@@ -15,5 +15,5 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app.kubernetes.io/name: {{ include "auth-service.fullname" . }}
+    app.kubernetes.io/name: {{ include "mlaas-ui.fullname" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}

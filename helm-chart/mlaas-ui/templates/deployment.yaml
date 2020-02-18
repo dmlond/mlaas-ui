@@ -6,7 +6,7 @@ kind: Deployment
 metadata:
   name: {{ include "mlaas-ui.fullname" . }}
   labels:
-    app.kubernetes.io/name: {{ include "auth-service.fullname" . }}
+    app.kubernetes.io/name: {{ include "mlaas-ui.fullname" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app: "{{.Chart.Name}}"
     environment: "{{ $environment }}"
@@ -17,18 +17,20 @@ spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "auth-service.fullname" . }}
+      app.kubernetes.io/name: {{ include "mlaas-ui.fullname" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "auth-service.fullname" . }}
+        app.kubernetes.io/name: {{ include "mlaas-ui.fullname" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
+        app: "{{.Chart.Name}}"
+        environment: "{{ $environment }}"    
     spec:
       imagePullSecrets:
-        - name: {{ include "auth-service.fullname" . }}-pull
+        - name: {{ include "mlaas-ui.fullname" . }}-pull
       containers:
-        - name: {{ include "auth-service.fullname" . }}
+        - name: {{ include "mlaas-ui.fullname" . }}
           image: "{{ $imageRepository }}:{{ $imageTag }}"
           imagePullPolicy: Always
           ports:
