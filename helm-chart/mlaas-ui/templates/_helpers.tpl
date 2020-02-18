@@ -25,17 +25,6 @@ Create chart name and version as used by the chart label.
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-{{/*
-Create the name of the service account to use
-*/}}
-{{- define "mlaas-ui.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create -}}
-    {{ default (include "mlaas-ui.fullname" .) .Values.serviceAccount.name }}
-{{- else -}}
-    {{ default "default" .Values.serviceAccount.name }}
-{{- end -}}
-{{- end -}}
-
 {{- define "imagePullSecret" }}
 {{- $root := required "registry.root is required!" .Values.registry.root -}}
 {{- $registryUser := required "registry.secret.username is required for imagePullSecret" .Values.registry.secret.username -}}
