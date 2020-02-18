@@ -6,7 +6,7 @@ stages:
   - scan_deployment
   - deploy
 
-  variables:
+variables:
   LOG_LEVEL: "info"
 
 include:
@@ -69,9 +69,9 @@ build_development_deployment:
   before_script:
     - export THE_DOCKERFILE="Dockerfile-deployment"
     - export THE_IMAGE="${CI_REGISTRY_IMAGE}/deployment/${CI_ENVIRONMENT_NAME}:${CI_COMMIT_SHORT_SHA}"
-    - export REACT_APP_AUTH_SERVICE_BASE_URI="${CI_ENVIRONMENT_NAME}-auth-service.ocp.dhe.duke.edu"
+    - export REACT_APP_PROXY_URI="${CI_ENVIRONMENT_NAME}-mlaas-service-proxy.ocp.dhe.duke.edu"
     - export UPSTREAM="${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}"
-    - export BUILD_ARGS="--build-arg UPSTREAM=${UPSTREAM} --build-arg REACT_APP_OAUTH_CLIENT_ID=${REACT_APP_OAUTH_CLIENT_ID} --build-arg REACT_APP_OAUTH_BASE_URI=${REACT_APP_OAUTH_BASE_URI} --build-arg REACT_APP_AUTH_SERVICE_BASE_URI=${REACT_APP_AUTH_SERVICE_BASE_URI} --build-arg REACT_APP_AUTH_SERVICE_AUTHENTICATION_ENDPOINT=${REACT_APP_AUTH_SERVICE_AUTHENTICATION_ENDPOINT}"
+    - export BUILD_ARGS="--build-arg UPSTREAM=${UPSTREAM} --build-arg REACT_APP_OAUTH_CLIENT_ID=${REACT_APP_OAUTH_CLIENT_ID} --build-arg REACT_APP_OAUTH_BASE_URI=${REACT_APP_OAUTH_BASE_URI} --build-arg REACT_APP_PROXY_URI=${REACT_APP_PROXY_URI} --build-arg REACT_APP_AUTH_SERVICE_AUTHENTICATION_ENDPOINT=${REACT_APP_AUTH_SERVICE_AUTHENTICATION_ENDPOINT}"
   extends: .kaniko_build
   environment:
     name: development
