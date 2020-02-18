@@ -8,9 +8,18 @@ services:
     env_file:
       - server.env
     depends_on:
-      - auth
+      - proxy
     ports:
-    - 3001:3000
+      - 3000:3000
+  proxy:
+    image: mlaas-service-proxy_proxy
+    volumes:
+      - ./proxy.conf:/etc/httpd/conf.d/proxy.conf
+    ports:
+      - 8080:8080
+    links:
+        - auth:auth
+        - project:project
   auth:
     image: auth-service_server
     env_file:
@@ -20,8 +29,29 @@ services:
       - puma
     links:
       - redis:redis.host
-    ports:
-      - 3000:3000
+  user:
+    image: user-information-service_server
+    env_file:
+        - user.env
+    command:
+        - puma
+    links:
+        - redis:redis.host            
+  project:
+    image: project-service_server
+    env_file:
+        - project.env
+        - project.db.env
+    command:
+        - puma
+    links:
+        - user:user.host
+        - db:postgres.db.host
+  db:
+    image: bitnami/postgresql:12
+    hostname: postgres.db.host
+    env_file:
+        - db.env
   redis:
     image: redis:latest
     hostname: redis.host
