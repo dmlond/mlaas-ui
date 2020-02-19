@@ -21,7 +21,10 @@ class Home extends Component {
     }
 
     handleAuthenticationSuccess(isSuccessful) {
-      //nothing to do
+      window.location.replace("?");
+      if (typeof window.history.replaceState == 'function') {
+          window.history.replaceState({}, '', window.location.href);
+      }
     }
 
     handleException(errorMessage) {

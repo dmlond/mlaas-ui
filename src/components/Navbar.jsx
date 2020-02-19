@@ -50,7 +50,7 @@ class Navbar extends Component {
             )
         }
         else {
-            const authUrl = `${config.oauth_base_uri}/authorize?response_type=code&client_id=${config.oauth_client_id}&state=login&redirect_uri=`+window.location.href
+            const authUrl = config['oauth_base_uri']+"/authorize?response_type=code&client_id="+config['oauth_client_id']+"&state="+window.location.origin+window.location.pathname+"&redirect_uri="+window.location.origin+'/';
             return (
                 <div>
                     <AppHeader 
