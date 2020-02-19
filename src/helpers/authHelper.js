@@ -53,7 +53,7 @@ const authHelper = {
         return new Promise((resolve, reject) => {
             authClient.authenticate(
                 this.getOauthCodeFromURI(),
-                window.location.origin+'/',
+                window.location.origin+'/login',
                 (jwtToken, username, expiration, timeToLive) => {
                     sessionStorage.setItem(jwtStoreKey, jwtToken);
                     const now = new Date();

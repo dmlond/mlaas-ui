@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import config from "../config/authconfig.js";
 import authHelper from '../helpers/authHelper';
 import {Link} from "react-router-dom";
-import { AppHeader, Dropdown, IconMenu, ActionButton, IconLogout } from "@duke-office-research-informatics/dracs";
+import { AppHeader, Dropdown, IconMenu, ActionButton, IconLogout, SolidDivider } from "@duke-office-research-informatics/dracs";
 
 class Navbar extends Component {
     handleLogout() {
@@ -15,7 +15,7 @@ class Navbar extends Component {
                 <AppHeader
                     width="calc(100% - 32px)"
                     backgroundColor="rgba(74,144,226,1)"
-                    childrenLeft={<Link to="/">Home </Link>}
+                    childrenLeft={<div><Link to="/">Home </Link><SolidDivider/><Link to="/projects">Projects</Link></div>}
                     childrenRight={
                         <Dropdown
                               buttonLabel={<IconMenu />}
@@ -50,7 +50,7 @@ class Navbar extends Component {
             )
         }
         else {
-            const authUrl = config['oauth_base_uri']+"/authorize?response_type=code&client_id="+config['oauth_client_id']+"&state="+window.location.pathname+"&redirect_uri="+window.location.origin+'/';
+            const authUrl = config['oauth_base_uri']+"/authorize?response_type=code&client_id="+config['oauth_client_id']+"&state="+window.location.pathname+"&redirect_uri="+window.location.origin+'/login';
             return (
                 <div>
                     <AppHeader 
