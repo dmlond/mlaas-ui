@@ -10,7 +10,9 @@ const projectServiceClient = {
         };
 
         axios(payload)
-          .then(processData)
+          .then((response) => {
+            processData(response.data)
+          })
           .catch((error) => {
             handleFailure(error.response.data);
           });
@@ -23,9 +25,7 @@ const projectServiceClient = {
                 url: projectIndexUrl,
                 method: 'get'
             },
-            (response) => {
-                successHandler(response.data);
-            },
+            successHandler,
             failureHandler
         )
     },
@@ -38,9 +38,7 @@ const projectServiceClient = {
                 method: 'post',
                 data: newProjectPayload
             },
-            (response) => {
-                successHandler(response.data);
-            },
+            successHandler,
             failureHandler
         ) 
     },
@@ -52,15 +50,13 @@ const projectServiceClient = {
                 url: projectProfileUrl,
                 method: 'get'
             },
-            (response) => {
-                successHandler(response.data);
-            },
+            successHandler,
             failureHandler
         )
 
     },
 
-    update(projectUpdatePayload, successHandler, failureHandler) {
+    update(projectId, projectUpdatePayload, successHandler, failureHandler) {
         var projectProfileUrl = `${config.proxy_uri}${config.projects_endpoint}/${projectId}`
         this.send(
             {
@@ -68,9 +64,7 @@ const projectServiceClient = {
                 method: 'put',
                 data: projectUpdatePayload
             },
-            (response) => {
-                successHandler(response.data);
-            },
+            successHandler,
             failureHandler
         )
     }

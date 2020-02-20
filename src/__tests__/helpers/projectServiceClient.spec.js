@@ -14,11 +14,13 @@ describe('projectServiceClient', () => {
         data: expectedError
       }
     };
+    var expectedData = {name:"name",description:"description"};
     var expectedSuccessResponse = {
         status: 200,
         statusText: "OK",
         headers: {},
         config: {},
+        data: expectedData
     };
     const fakeJwt = "abc.123.xyz";
     const origAuthHelperJwt = authHelper.jwt;
@@ -26,10 +28,10 @@ describe('projectServiceClient', () => {
     function mocked_response() {
         return new Promise((resolve, reject) => {
           process.nextTick(function() {
-            if (!shouldSucceed) {
-              reject(expectedFailureResponse);
-            } else {
+            if (shouldSucceed) {
               resolve(expectedSuccessResponse);
+            } else {
+              reject(expectedFailureResponse);              
             }
           });
         });
@@ -37,6 +39,21 @@ describe('projectServiceClient', () => {
     axios.mockImplementation(mocked_response);
 
     const origSend = projectServiceClient.send;
+    var handleSuccess = jest.fn();
+    var handleFailure = jest.fn();
+    beforeEach(() => {
+      authHelper.jwt = jest.fn();      
+      authHelper.jwt.mockImplementation(() => {
+        return fakeJwt;
+      });
+
+      handleSuccess.mockClear();
+      handleFailure.mockClear();
+    });
+    afterEach(() => {
+      authHelper.jwt = origAuthHelperJwt;
+    });
+
     function spyProjectServiceClientSend() {
       beforeEach(() => {
         projectServiceClient.send = jest.fn();
@@ -80,22 +97,6 @@ describe('projectServiceClient', () => {
           });
       });
     }
-
-    var handleSuccess = jest.fn();
-    var handleFailure = jest.fn();
-    beforeEach(() => {
-      authHelper.jwt = jest.fn();      
-      authHelper.jwt.mockImplementation(() => {
-        return fakeJwt;
-      });
-
-      handleSuccess.mockClear();
-      handleFailure.mockClear();
-    });
-    afterEach(() => {
-      authHelper.jwt = origAuthHelperJwt;
-    });
-
     
     describe('.send', () => {
         describe('with success', () => {
@@ -109,7 +110,7 @@ describe('projectServiceClient', () => {
               projectServiceClient.send(payload, handleSuccess, handleFailure);
               setImmediate(() => {
                 expect(handleSuccess).toBeCalledWith(
-                  expectedSuccessResponse
+                  expectedData
                 );
                 expect(payload.headers.Authorization).toEqual(fakeJwt);
                 done();
