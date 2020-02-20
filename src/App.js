@@ -3,6 +3,7 @@ import { Switch, Route } from "react-router-dom";
 import Home from "./components/Home";
 import Login from "./components/Login";
 import Projects from "./components/Projects";
+import ProjectProfile from "./components/ProjectProfile";
 import Navbar from "./components/Navbar";
 
 class App extends Component {
@@ -11,9 +12,10 @@ class App extends Component {
       <main>
         <Navbar />
         <Switch>
-          <Route path="/" component={Home} exact />
-          <Route path="/login" component={Login} exact />
-          <Route path="/projects" component={Projects} exact />
+          <Route exact path="/" component={Home} />
+          <Route exact path="/login" component={Login} />
+          <Route exact path="/projects" component={Projects} />
+          <Route path="/projects/:projectid" component={ProjectProfile} />
         </Switch>
       </main>
     )
