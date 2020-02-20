@@ -12,7 +12,6 @@ class Login extends Component {
     }
 
     componentDidMount() {
-        console.log("Login mounted!");
         if (authHelper.accessCodeExists()) {
           authHelper.login().then(
             this.handleAuthenticationSuccess,
@@ -22,7 +21,6 @@ class Login extends Component {
       }
   
       handleAuthenticationSuccess(isSuccessful) {
-        console.log("authentication success!");
         window.location.assign(window.location.origin+authHelper.authReturnParams().get('state'));
       }
   
