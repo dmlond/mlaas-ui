@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import authHelper from '../helpers/authHelper';
 import projectServiceClient from '../helpers/projectServiceClient';
+import ProjectForm from './ProjectForm';
+
 import config from "../config/authconfig.js";
-import { List, DoubleLineListItem } from "@duke-office-research-informatics/dracs";
+import { Modal, List, DoubleLineListItem, Card, CardHeader, CardBody, Button } from "@duke-office-research-informatics/dracs";
 
 class Projects extends Component {
     constructor(props) {
@@ -10,7 +12,14 @@ class Projects extends Component {
         this.loadProjects = this.loadProjects.bind(this);
         this.handleSuccessfulProjectLoad = this.handleSuccessfulProjectLoad.bind(this);
         this.handleFailedProjectLoad = this.handleFailedProjectLoad.bind(this);
+        this.handleNewProjectClick = this.handleNewProjectClick.bind(this);
+        this.handleCloseNewProject = this.handleCloseNewProject.bind(this);
+        this.handleProjectSubmission = this.handleProjectSubmission.bind(this);
+        this.handleSuccessfulProjectCreation = this.handleSuccessfulProjectCreation.bind(this);
+
         this.state = {
+            projectCreationHasError: false,
+            newProjectClicked: false,
             projects: []
         };
     }
@@ -42,8 +51,42 @@ class Projects extends Component {
         });
     }
 
-    handleProjectSelection(projectid, event) {
+    handleProjectSelection(projectid) {
         window.location.assign(window.location.origin+'/projects/'+projectid);
+    }
+
+    handleNewProjectClick(event) {
+        event.preventDefault();
+        this.setState({
+            newProjectClicked: true
+        });
+    }
+
+    handleCloseNewProject(event) {
+        event.preventDefault();
+        this.setState({
+            newProjectClicked: false
+        });
+    }
+
+    handleProjectSubmission(name, description, errorHandler) {
+        let newProjectPayload = {
+            name: name,
+            description: description
+        };
+        projectServiceClient.create(
+            newProjectPayload,
+            this.handleSuccessfulProjectCreation,
+            errorHandler
+        );
+    }
+
+    handleSuccessfulProjectCreation(data) {
+        const projectList = this.state.projects.concat(data);
+        this.setState({
+            newProjectClicked: false,
+            projects: projectList
+        });
     }
 
     render() {
@@ -51,20 +94,37 @@ class Projects extends Component {
 
         if (authHelper.isLoggedIn()) {
           renderBody = <div>
-              <p>Projects:</p>
-              <List>
-                { this.state.projects.map(project => {
-                    return(
-                        <DoubleLineListItem 
-                            key={project.id}
-                            lineOne={project.name}
-                            lineTwo={project.description}
-                            clickable={true}
-                            onClick={this.handleProjectSelection.bind(this,project.id)}
-                        />
-                    );                    
-                })} 
-              </List>
+              <Modal
+                active={this.state.newProjectClicked}
+              >
+                <ProjectForm
+                    onCancel={this.handleCloseNewProject}
+                    onSubmit={this.handleProjectSubmission}
+                />
+              </Modal>
+              <Card>
+                <CardHeader title="Projects">
+                    <Button 
+                        label="New Project" 
+                        onClick={this.handleNewProjectClick}
+                    />
+                </CardHeader>
+                <CardBody>
+                    <List>
+                        { this.state.projects.map(project => {
+                            return(
+                                <DoubleLineListItem 
+                                    key={project.id}
+                                    lineOne={project.name}
+                                    lineTwo={project.description}
+                                    clickable={true}
+                                    onClick={this.handleProjectSelection.bind(this,project.id)}
+                                />
+                            );                    
+                        })} 
+                    </List>
+                </CardBody>
+            </Card>
           </div>
         }
         else {
