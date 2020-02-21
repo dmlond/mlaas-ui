@@ -4,7 +4,8 @@ import { Card, CardHeader, CardBody, Input, Button } from "@duke-office-research
 class ProjectForm extends Component {
     constructor(props) {
         super(props);
-        this.formChange = this.formChange.bind(this);
+        this.nameChange = this.nameChange.bind(this);
+        this.descriptionChange = this.descriptionChange.bind(this);
         this.handleSubmissionClick = this.handleSubmissionClick.bind(this);
         this.handleSubmissionError = this.handleSubmissionError.bind(this);
 
@@ -13,18 +14,44 @@ class ProjectForm extends Component {
         this.state = {
             hasError: false,
             name: projectName,
-            description: projectDescription
+            description: projectDescription,
+            nameChanged: false,
+            descriptionChanged: false
         };
     }
 
-    formChange(value, name) {
+    nameChange(value) {
         this.setState({
-            [name]: value
+            nameChanged: true,
+            name: value
+        });
+    }
+
+    descriptionChange(value) {
+        this.setState({
+            descriptionChanged: true,
+            description: value
         });
     }
 
     handleSubmissionClick() {
-        this.props.onSubmit(this.state.name,this.state.description, this.handleSubmissionError);
+        var payload = {}
+        if (this.props.project) {
+            if (!(this.state.nameChanged || this.state.descriptionChanged)) {
+                return;
+            }
+            if (this.state.nameChanged) {
+                payload.name = this.state.name;
+            }
+            if (this.state.descriptionChanged) {
+                payload.description = this.state.description;
+            }
+        }
+        else {
+            payload.name = this.state.nameChanged ? this.state.name : "";
+            payload.description = this.state.descriptionChanged ? this.state.description : "";
+        }
+        this.props.onSubmit(payload, this.handleSubmissionError);
     }
 
     handleSubmissionError(errorMessage) {
@@ -54,14 +81,14 @@ class ProjectForm extends Component {
                     name="name"
                     labelText="Name"
                     requred={true}
-                    onChange={this.formChange}
+                    onChange={this.nameChange}
                     value={this.state.name}
                 />
                 <Input
                     name="description"
                     labelText="Description"
                     required={true}
-                    onChange={this.formChange}
+                    onChange={this.descriptionChange}
                     value={this.state.description}
                 />
                 {errorMessage}
