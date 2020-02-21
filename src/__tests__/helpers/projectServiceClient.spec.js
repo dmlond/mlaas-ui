@@ -145,11 +145,15 @@ describe('projectServiceClient', () => {
       let expectedProjectServicePath = config.projects_endpoint;
       let expectedProjectServiceSendMethod = 'post';
       let newProjectPayload = {
+        project: {
         name: "newProject",
-        description: "Test Project Creation"
+          description: "Test Project Creation"
+        }
       };
       let expectedExtraPayload = {
-        data: newProjectPayload
+        data: {
+          project: newProjectPayload
+        }
       };
       function subject(p, s,f) {
           projectServiceClient.create(p, s,f);
@@ -175,10 +179,14 @@ describe('projectServiceClient', () => {
       let expectedProjectServicePath = config.projects_endpoint+"/"+expectedProjectId;
       let expectedProjectServiceSendMethod = 'put';
       let updateProjectPayload = {
-        description: "Test Project Creation"
+        project: {
+          description: "Test Project Creation"
+        }
       };
       let expectedExtraPayload = {
-        data: updateProjectPayload
+        data: {
+          project: updateProjectPayload
+        }
       };
 
       function subject(i, p, s,f) {

@@ -36,7 +36,9 @@ const projectServiceClient = {
             {
                 url: projectIndexUrl,
                 method: 'post',
-                data: newProjectPayload
+                data: {
+                    project: newProjectPayload
+                }
             },
             successHandler,
             failureHandler
@@ -62,7 +64,9 @@ const projectServiceClient = {
             {
                 url: projectProfileUrl,
                 method: 'put',
-                data: projectUpdatePayload
+                data: {
+                    project: projectUpdatePayload
+                }
             },
             successHandler,
             failureHandler
