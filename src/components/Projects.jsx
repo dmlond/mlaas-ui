@@ -69,11 +69,7 @@ class Projects extends Component {
         });
     }
 
-    handleProjectSubmission(name, description, errorHandler) {
-        let newProjectPayload = {
-            name: name,
-            description: description
-        };
+    handleProjectSubmission(newProjectPayload, errorHandler) {
         projectServiceClient.create(
             newProjectPayload,
             this.handleSuccessfulProjectCreation,
@@ -92,6 +88,7 @@ class Projects extends Component {
     render() {
         var renderBody;
 
+        var loadError = this.state.hasError ? <p>Error Loading Projects: {this.state.errorMessage}</p> : <div></div>;
         if (authHelper.isLoggedIn()) {
           renderBody = <div>
               <Modal
@@ -123,6 +120,7 @@ class Projects extends Component {
                             );                    
                         })} 
                     </List>
+                    {loadError}
                 </CardBody>
             </Card>
           </div>

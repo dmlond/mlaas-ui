@@ -3,7 +3,8 @@ import { withRouter } from "react-router-dom";
 import authHelper from '../helpers/authHelper';
 import projectServiceClient from '../helpers/projectServiceClient';
 import config from "../config/authconfig.js";
-import { Spinner } from "@duke-office-research-informatics/dracs";
+import { Modal, Button, Spinner, Card, CardHeader, CardBody } from "@duke-office-research-informatics/dracs";
+import ProjectForm from './ProjectForm';
 
 class ProjectProfile extends Component {
     constructor(props) {
@@ -11,8 +12,15 @@ class ProjectProfile extends Component {
         this.loadProject = this.loadProject.bind(this);
         this.handleSuccessfulProjectLoad = this.handleSuccessfulProjectLoad.bind(this);
         this.handleFailedProjectLoad = this.handleFailedProjectLoad.bind(this);
+        this.handleUpdateProjectClick = this.handleUpdateProjectClick.bind(this);
+        this.handleCloseUpdateProject = this.handleCloseUpdateProject.bind(this);
+        this.handleUpdateProjectSubmission = this.handleUpdateProjectSubmission.bind(this);
+        this.handleSuccessfulProjectUpdate = this.handleSuccessfulProjectUpdate.bind(this);
+
         this.state = {
             isLoading: true,
+            projectUpdateHasError: false,
+            updateProjectClicked: false,
             project: null
         };
     }
@@ -28,7 +36,6 @@ class ProjectProfile extends Component {
 
     loadProject() {
         let id = this.props.match.params.projectid;
-        console.log("Loading Project "+id);
         projectServiceClient.show(
             id,
             this.handleSuccessfulProjectLoad,
@@ -51,22 +58,67 @@ class ProjectProfile extends Component {
         });
     }
 
+    handleUpdateProjectClick(event) {
+        event.preventDefault();
+        this.setState({
+            updateProjectClicked: true
+        });
+    }
+
+    handleCloseUpdateProject(event) {
+        event.preventDefault();
+        this.setState({
+            updateProjectClicked: false
+        });
+    }
+
+    handleUpdateProjectSubmission(updateProjectPayload, errorHandler) {
+        projectServiceClient.update(
+            this.state.project.id,
+            updateProjectPayload,
+            this.handleSuccessfulProjectUpdate,
+            errorHandler
+        );
+    }
+
+    handleSuccessfulProjectUpdate(data) {
+        this.setState({
+            updateProjectClicked: false,
+            project: data
+        });
+    }
+
     render() {
         var renderBody;
+        var loadError = this.state.hasError ? <p>Error Loading Project: {this.state.errorMessage}</p> : <div></div>;
+
         if (authHelper.isLoggedIn()) {
             if (this.state.isLoading) {
                 renderBody = <div><Spinner /></div>
             }
-            else if (this.state.hasError) {
-                renderBody = <div>
-                    <p>Error: { this.state.errorMessage.error }</p>
-                </div>  
-            }
             else {
                 renderBody = <div>
-                    <p>Id: { this.state.project.id }</p>
-                    <p>Name: { this.state.project.name }</p>
-                    <p>Description: { this.state.project.description }</p>
+                    <Modal
+                        active={this.state.updateProjectClicked}
+                    >
+                        <ProjectForm
+                            project={this.state.project}
+                            onCancel={this.handleCloseUpdateProject}
+                            onSubmit={this.handleUpdateProjectSubmission}
+                        />
+                    </Modal>
+                    <Card>
+                        <CardHeader title={ this.state.project.name } >
+                            <Button 
+                                label="Edit" 
+                                onClick={this.handleUpdateProjectClick}
+                            />
+                        </CardHeader>
+                        <CardBody>
+                            <p>{ this.state.project.description }</p>
+                        </CardBody>
+                        {loadError}
+                    </Card>
                 </div>
             }
         }
