@@ -4,7 +4,6 @@ jest.useFakeTimers();
 import axios from 'axios';
 import projectServiceClient from '../../helpers/projectServiceClient';
 import authHelper from '../../helpers/authHelper';
-import config from "../../config/authconfig.js";
 
 describe('projectServiceClient', () => {
     var shouldSucceed = true;
@@ -131,7 +130,7 @@ describe('projectServiceClient', () => {
     });
 
     describe('.index', () => {
-      let expectedProjectServicePath = config.projects_endpoint;
+      let expectedProjectServicePath = '/api/v1/projects';
       let expectedProjectServiceSendMethod = 'get'
 
       function subject(s,f) {
@@ -142,7 +141,7 @@ describe('projectServiceClient', () => {
     });
 
     describe('.create', () => {
-      let expectedProjectServicePath = config.projects_endpoint;
+      let expectedProjectServicePath = '/api/v1/projects';
       let expectedProjectServiceSendMethod = 'post';
       let newProjectPayload = {
         project: {
@@ -164,7 +163,7 @@ describe('projectServiceClient', () => {
 
     describe('.show', () => {
       let expectedProjectId = "abc-123-xyz";
-      let expectedProjectServicePath = config.projects_endpoint+"/"+expectedProjectId;
+      let expectedProjectServicePath = '/api/v1/projects'+"/"+expectedProjectId;
       let expectedProjectServiceSendMethod = 'get'
 
       function subject(i, s,f) {
@@ -176,7 +175,7 @@ describe('projectServiceClient', () => {
 
     describe('.update', () => {
       let expectedProjectId = "abc-123-xyz";
-      let expectedProjectServicePath = config.projects_endpoint+"/"+expectedProjectId;
+      let expectedProjectServicePath = '/api/v1/projects'+"/"+expectedProjectId;
       let expectedProjectServiceSendMethod = 'put';
       let updateProjectPayload = {
         project: {

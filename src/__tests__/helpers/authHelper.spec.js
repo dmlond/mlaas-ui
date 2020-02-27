@@ -1,7 +1,6 @@
 jest.useFakeTimers();
 import authHelper from '../../helpers/authHelper';
 import authClient from '../../helpers/authClient';
-import config from "../../config/authconfig.js";
 
 describe('authHelper', () => {
   const expectedJwt = 'abc123xyz';

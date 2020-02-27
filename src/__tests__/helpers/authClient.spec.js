@@ -3,7 +3,6 @@ jest.useFakeTimers();
 
 import axios from 'axios';
 import authClient from '../../helpers/authClient';
-import config from "../../config/authconfig.js";
 
 describe('authClient', () => {
     var shouldSucceed = true;
@@ -124,7 +123,7 @@ describe('authClient', () => {
     describe('.authenticate', () => {
         let oauthCode = 'abc123xyz';
         let expectedRedirect = window.location.href;
-        let expectedAuthServicePath = config['auth_service_endpoint'];
+        let expectedAuthServicePath = '/api/v1/authentication';
         let expectedAuthServiceSendMethod = 'post'
         let authServicePayload = {
             data: {
