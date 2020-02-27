@@ -18,7 +18,7 @@ const projectServiceClient = {
           });
     },
 
-    index(successHandler, failureHandler) {
+    projects(successHandler, failureHandler) {
         var projectIndexUrl = `${config.proxy_uri}/api/v1/projects`
         this.send(
             {
@@ -30,7 +30,7 @@ const projectServiceClient = {
         )
     },
 
-    create(newProjectPayload, successHandler, failureHandler) {
+    createProject(newProjectPayload, successHandler, failureHandler) {
         var projectIndexUrl = `${config.proxy_uri}/api/v1/projects`
         this.send(
             {
@@ -45,7 +45,7 @@ const projectServiceClient = {
         ) 
     },
 
-    show(projectId, successHandler, failureHandler) {
+    project(projectId, successHandler, failureHandler) {
         var projectProfileUrl = `${config.proxy_uri}/api/v1/projects/${projectId}`
         this.send(
             {
@@ -58,7 +58,7 @@ const projectServiceClient = {
 
     },
 
-    update(projectId, projectUpdatePayload, successHandler, failureHandler) {
+    updateProject(projectId, projectUpdatePayload, successHandler, failureHandler) {
         var projectProfileUrl = `${config.proxy_uri}/api/v1/projects/${projectId}`
         this.send(
             {

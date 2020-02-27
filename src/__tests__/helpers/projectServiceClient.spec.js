@@ -129,18 +129,18 @@ describe('projectServiceClient', () => {
           });
     });
 
-    describe('.index', () => {
+    describe('.projects', () => {
       let expectedProjectServicePath = '/api/v1/projects';
       let expectedProjectServiceSendMethod = 'get'
 
       function subject(s,f) {
-          projectServiceClient.index(s,f);
+          projectServiceClient.projects(s,f);
       }
 
       testProjectServiceApi(expectedProjectServicePath, expectedProjectServiceSendMethod, subject);
     });
 
-    describe('.create', () => {
+    describe('.createProject', () => {
       let expectedProjectServicePath = '/api/v1/projects';
       let expectedProjectServiceSendMethod = 'post';
       let newProjectPayload = {
@@ -155,25 +155,25 @@ describe('projectServiceClient', () => {
         }
       };
       function subject(p, s,f) {
-          projectServiceClient.create(p, s,f);
+          projectServiceClient.createProject(p, s,f);
       }
 
       testProjectServiceApi(expectedProjectServicePath, expectedProjectServiceSendMethod, subject, expectedExtraPayload, newProjectPayload);        
     });
 
-    describe('.show', () => {
+    describe('.project', () => {
       let expectedProjectId = "abc-123-xyz";
       let expectedProjectServicePath = '/api/v1/projects'+"/"+expectedProjectId;
       let expectedProjectServiceSendMethod = 'get'
 
       function subject(i, s,f) {
-          projectServiceClient.show(i, s,f);
+          projectServiceClient.project(i, s,f);
       }
 
       testProjectServiceApi(expectedProjectServicePath, expectedProjectServiceSendMethod, subject, {}, expectedProjectId);
     });
 
-    describe('.update', () => {
+    describe('.updateProject', () => {
       let expectedProjectId = "abc-123-xyz";
       let expectedProjectServicePath = '/api/v1/projects'+"/"+expectedProjectId;
       let expectedProjectServiceSendMethod = 'put';
@@ -189,7 +189,7 @@ describe('projectServiceClient', () => {
       };
 
       function subject(i, p, s,f) {
-          projectServiceClient.update(i, p, s,f);
+          projectServiceClient.updateProject(i, p, s,f);
       }
 
       testProjectServiceApi(expectedProjectServicePath, expectedProjectServiceSendMethod, subject, expectedExtraPayload, expectedProjectId, updateProjectPayload);

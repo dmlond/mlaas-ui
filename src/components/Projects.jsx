@@ -32,7 +32,7 @@ class Projects extends Component {
     }
 
     loadProjects() {
-        projectServiceClient.index(
+        projectServiceClient.projects(
             this.handleSuccessfulProjectLoad,
             this.handleFailedProjectLoad
         );
@@ -70,7 +70,7 @@ class Projects extends Component {
     }
 
     handleProjectSubmission(newProjectPayload, errorHandler) {
-        projectServiceClient.create(
+        projectServiceClient.createProject(
             newProjectPayload,
             this.handleSuccessfulProjectCreation,
             errorHandler

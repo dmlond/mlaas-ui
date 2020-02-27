@@ -36,7 +36,7 @@ class ProjectProfile extends Component {
 
     loadProject() {
         let id = this.props.match.params.projectid;
-        projectServiceClient.show(
+        projectServiceClient.project(
             id,
             this.handleSuccessfulProjectLoad,
             this.handleFailedProjectLoad
@@ -73,7 +73,7 @@ class ProjectProfile extends Component {
     }
 
     handleUpdateProjectSubmission(updateProjectPayload, errorHandler) {
-        projectServiceClient.update(
+        projectServiceClient.updateProject(
             this.state.project.id,
             updateProjectPayload,
             this.handleSuccessfulProjectUpdate,
