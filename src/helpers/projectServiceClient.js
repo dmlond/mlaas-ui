@@ -55,7 +55,6 @@ const projectServiceClient = {
             successHandler,
             failureHandler
         )
-
     },
 
     updateProject(projectId, projectUpdatePayload, successHandler, failureHandler) {
@@ -71,6 +70,74 @@ const projectServiceClient = {
             successHandler,
             failureHandler
         )
-    }
+    },
+
+    models(search, successHandler, failureHandler) {
+        var modelIndexUrl = `${config.proxy_uri}/api/v1/ai_models`
+        if (search) {
+            this.send(
+                {
+                    url: modelIndexUrl,
+                    method: 'get',
+                    params: search
+                },
+                successHandler,
+                failureHandler
+            )
+        }
+        else {
+            this.send(
+                {
+                    url: modelIndexUrl,
+                    method: 'get'
+                },
+                successHandler,
+                failureHandler
+            )            
+        }
+    },
+
+    model(modelId, successHandler, failureHandler) {
+        var modelProfileUrl = `${config.proxy_uri}/api/v1/ai_models/${modelId}`
+        this.send(
+            {
+                url: modelProfileUrl,
+                method: 'get'
+            },
+            successHandler,
+            failureHandler
+        )
+
+    },
+
+    createModel(projectId, newModelPayload, successHandler, failureHandler) {
+        var projectIndexUrl = `${config.proxy_uri}/api/v1/projects/${projectId}/ai_models`
+        this.send(
+            {
+                url: projectIndexUrl,
+                method: 'post',
+                data: {
+                    ai_model: newModelPayload
+                }
+            },
+            successHandler,
+            failureHandler
+        ) 
+    },
+
+    updateModel( modelId, modelUpdatePayload, successHandler, failureHandler) {
+        var modelProfileUrl = `${config.proxy_uri}/api/v1/ai_models/${modelId}`
+        this.send(
+            {
+                url: modelProfileUrl,
+                method: 'put',
+                data: {
+                    ai_model: modelUpdatePayload
+                }
+            },
+            successHandler,
+            failureHandler
+        )
+    },
 };
 export default projectServiceClient;

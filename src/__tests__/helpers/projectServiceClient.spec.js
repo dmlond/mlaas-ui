@@ -178,9 +178,7 @@ describe('projectServiceClient', () => {
       let expectedProjectServicePath = '/api/v1/projects'+"/"+expectedProjectId;
       let expectedProjectServiceSendMethod = 'put';
       let updateProjectPayload = {
-        project: {
-          description: "Test Project Creation"
-        }
+        description: "Test Project Creation"
       };
       let expectedExtraPayload = {
         data: {
@@ -193,5 +191,86 @@ describe('projectServiceClient', () => {
       }
 
       testProjectServiceApi(expectedProjectServicePath, expectedProjectServiceSendMethod, subject, expectedExtraPayload, expectedProjectId, updateProjectPayload);
+    });
+
+    describe('.models', () => {
+      let expectedProjectServicePath = '/api/v1/ai_models';
+      let expectedProjectServiceSendMethod = 'get'
+
+      function subject(search,s,f) {
+        projectServiceClient.models(search,s,f);
+      }
+
+      describe('without search.project_id', () => {
+        let expectedSearch = null;
+    
+        testProjectServiceApi(expectedProjectServicePath, expectedProjectServiceSendMethod, subject, {}, expectedSearch); 
+      });
+
+      describe('with search.project_id', () => {
+        let expectedProjectId = "abc-123-xyz";
+        let expectedSearch = {
+          project_id: expectedProjectId
+        };
+        let expectedExtraPayload = {
+          params: expectedSearch
+        };
+    
+        testProjectServiceApi(expectedProjectServicePath, expectedProjectServiceSendMethod, subject, expectedExtraPayload, expectedSearch);
+      });
+    });
+
+    describe('.model', () => {
+      let expectedModelId = "abc-123-xyz";
+      let expectedProjectServicePath = '/api/v1/ai_models'+"/"+expectedModelId;
+      let expectedProjectServiceSendMethod = 'get'
+
+      function subject(i, s,f) {
+          projectServiceClient.model(i, s,f);
+      }
+
+      testProjectServiceApi(expectedProjectServicePath, expectedProjectServiceSendMethod, subject, {}, expectedModelId);
+    });
+
+    describe('.updateModel', () => {
+      let expectedModelId = "abc-123-xyz";
+      let expectedProjectServicePath = '/api/v1/ai_models'+"/"+expectedModelId;
+      let expectedProjectServiceSendMethod = 'put';
+      let updateModelPayload = {
+        description: "Test Model Creation"
+      };
+      let expectedExtraPayload = {
+        data: {
+          ai_model: updateModelPayload
+        }
+      };
+
+      function subject(i, p, s,f) {
+          projectServiceClient.updateModel(i, p, s,f);
+      }
+
+      testProjectServiceApi(expectedProjectServicePath, expectedProjectServiceSendMethod, subject, expectedExtraPayload, expectedModelId, updateModelPayload);
+    });
+
+    describe('.createModel', () => {
+      let expectedProjectId = "abc-123-xyz";
+      let expectedProjectServicePath = '/api/v1/projects/'+expectedProjectId+'/ai_models';
+      let expectedProjectServiceSendMethod = 'post';
+      let newModelPayload = {
+        ai_model: {
+          name: "newModel",
+          description: "Test Model Creation"
+        }
+      };
+      let expectedExtraPayload = {
+        data: {
+          ai_model: newModelPayload
+        }
+      };
+      function subject(pid, p, s,f) {
+          projectServiceClient.createModel(pid, p, s,f);
+      }
+
+      testProjectServiceApi(expectedProjectServicePath, expectedProjectServiceSendMethod, subject, expectedExtraPayload, expectedProjectId, newModelPayload);        
     });
 });
