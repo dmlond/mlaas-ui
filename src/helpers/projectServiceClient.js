@@ -107,7 +107,6 @@ const projectServiceClient = {
             successHandler,
             failureHandler
         )
-
     },
 
     createModel(projectId, newModelPayload, successHandler, failureHandler) {
@@ -138,6 +137,33 @@ const projectServiceClient = {
             successHandler,
             failureHandler
         )
+    },
+
+    schedule(modelId, successHandler, failureHandler) {
+        var scheduleUrl = `${config.proxy_uri}/api/v1/ai_models/${modelId}/schedule`;
+        this.send(
+            {
+                url: scheduleUrl,
+                method: 'get'
+            },
+            successHandler,
+            failureHandler
+        )
+    },
+
+    applySchedule(modelId, payload, successHandler, failureHandler) {
+        var scheduleUrl = `${config.proxy_uri}/api/v1/ai_models/${modelId}/schedule`;
+        this.send(
+            {
+                url: scheduleUrl,
+                method: 'post',
+                data: {
+                    schedule: payload
+                }
+            },
+            successHandler,
+            failureHandler
+        ) 
     },
 };
 export default projectServiceClient;

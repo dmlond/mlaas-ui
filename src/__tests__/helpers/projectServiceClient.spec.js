@@ -144,10 +144,8 @@ describe('projectServiceClient', () => {
       let expectedProjectServicePath = '/api/v1/projects';
       let expectedProjectServiceSendMethod = 'post';
       let newProjectPayload = {
-        project: {
         name: "newProject",
-          description: "Test Project Creation"
-        }
+        description: "Test Project Creation"
       };
       let expectedExtraPayload = {
         data: {
@@ -272,5 +270,36 @@ describe('projectServiceClient', () => {
       }
 
       testProjectServiceApi(expectedProjectServicePath, expectedProjectServiceSendMethod, subject, expectedExtraPayload, expectedProjectId, newModelPayload);        
+    });
+
+    describe('.schedule', () => {
+      let expectedModelId = "abc-123-xyz";
+      let expectedProjectServicePath = '/api/v1/ai_models'+"/"+expectedModelId+'/schedule';
+      let expectedProjectServiceSendMethod = 'get'
+
+      function subject(mid,s,f) {
+          projectServiceClient.schedule(mid,s,f);
+      }
+
+      testProjectServiceApi(expectedProjectServicePath, expectedProjectServiceSendMethod, subject, {}, expectedModelId);
+    });
+
+    describe('.applySchedule', () => {
+      let expectedModelId = "abc-123-xyz";
+      let expectedProjectServicePath = '/api/v1/ai_models'+"/"+expectedModelId+'/schedule';
+      let expectedProjectServiceSendMethod = 'post';
+      let scedulePayload = {
+        schedule_interval: "0 1 * * *"
+      };
+      let expectedExtraPayload = {
+        data: {
+          schedule: scedulePayload
+        }
+      };
+      function subject(mid, p, s,f) {
+          projectServiceClient.applySchedule(mid, p, s,f);
+      }
+
+      testProjectServiceApi(expectedProjectServicePath, expectedProjectServiceSendMethod, subject, expectedExtraPayload, expectedModelId, scedulePayload);        
     });
 });
