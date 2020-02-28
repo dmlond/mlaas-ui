@@ -284,7 +284,7 @@ describe('projectServiceClient', () => {
       testProjectServiceApi(expectedProjectServicePath, expectedProjectServiceSendMethod, subject, {}, expectedModelId);
     });
 
-    describe('.applySchedule', () => {
+    describe('.setSchedule', () => {
       let expectedModelId = "abc-123-xyz";
       let expectedProjectServicePath = '/api/v1/ai_models'+"/"+expectedModelId+'/schedule';
       let expectedProjectServiceSendMethod = 'post';
@@ -297,9 +297,44 @@ describe('projectServiceClient', () => {
         }
       };
       function subject(mid, p, s,f) {
-          projectServiceClient.applySchedule(mid, p, s,f);
+          projectServiceClient.setSchedule(mid, p, s,f);
       }
 
       testProjectServiceApi(expectedProjectServicePath, expectedProjectServiceSendMethod, subject, expectedExtraPayload, expectedModelId, scedulePayload);        
     });
+
+    describe('.environment', () => {
+      let expectedModelId = "abc-123-xyz";
+      let expectedProjectServicePath = '/api/v1/ai_models'+"/"+expectedModelId+'/environment';
+      let expectedProjectServiceSendMethod = 'get'
+
+      function subject(mid,s,f) {
+          projectServiceClient.environment(mid,s,f);
+      }
+
+      testProjectServiceApi(expectedProjectServicePath, expectedProjectServiceSendMethod, subject, {}, expectedModelId);
+    });
+
+    describe('.setEnvironment', () => {
+      let expectedModelId = "abc-123-xyz";
+      let expectedProjectServicePath = '/api/v1/ai_models'+"/"+expectedModelId+'/environment';
+      let expectedProjectServiceSendMethod = 'post';
+      let environmentPayload = {
+        variables:{
+          PIPELINE_USER: "theUserz",
+          PIPELINE_PASSWORD: "a1bn23"
+        }
+      };
+      let expectedExtraPayload = {
+        data: {
+          environment: environmentPayload
+        }
+      };
+      function subject(mid, p, s,f) {
+          projectServiceClient.setEnvironment(mid, p, s,f);
+      }
+
+      testProjectServiceApi(expectedProjectServicePath, expectedProjectServiceSendMethod, subject, expectedExtraPayload, expectedModelId, environmentPayload);        
+    });
+
 });

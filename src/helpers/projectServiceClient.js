@@ -151,7 +151,7 @@ const projectServiceClient = {
         )
     },
 
-    applySchedule(modelId, payload, successHandler, failureHandler) {
+    setSchedule(modelId, payload, successHandler, failureHandler) {
         var scheduleUrl = `${config.proxy_uri}/api/v1/ai_models/${modelId}/schedule`;
         this.send(
             {
@@ -159,6 +159,33 @@ const projectServiceClient = {
                 method: 'post',
                 data: {
                     schedule: payload
+                }
+            },
+            successHandler,
+            failureHandler
+        ) 
+    },
+
+    environment(modelId, successHandler, failureHandler) {
+        var environmentUrl = `${config.proxy_uri}/api/v1/ai_models/${modelId}/environment`;
+        this.send(
+            {
+                url: environmentUrl,
+                method: 'get'
+            },
+            successHandler,
+            failureHandler
+        )
+    },
+
+    setEnvironment(modelId, payload, successHandler, failureHandler) {
+        var environmentUrl = `${config.proxy_uri}/api/v1/ai_models/${modelId}/environment`;
+        this.send(
+            {
+                url: environmentUrl,
+                method: 'post',
+                data: {
+                    environment: payload
                 }
             },
             successHandler,
