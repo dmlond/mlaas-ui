@@ -337,4 +337,49 @@ describe('projectServiceClient', () => {
       testProjectServiceApi(expectedProjectServicePath, expectedProjectServiceSendMethod, subject, expectedExtraPayload, expectedModelId, environmentPayload);        
     });
 
+    describe('.deployments', () => {
+      let expectedModelId = "abc-123-xyz";
+      let expectedProjectServicePath = '/api/v1/ai_models/'+expectedModelId+'/deployments';
+      let expectedProjectServiceSendMethod = 'get'
+
+      function subject(mid,s,f) {
+          projectServiceClient.deployments(mid,s,f);
+      }
+
+      testProjectServiceApi(expectedProjectServicePath, expectedProjectServiceSendMethod, subject, {}, expectedModelId);
+    });
+
+    describe('.createDeployment', () => {
+      let expectedModelId = "abc-123-xyz";
+      let expectedProjectServicePath = '/api/v1/ai_models/'+expectedModelId+'/deployments';
+      let expectedProjectServiceSendMethod = 'post';
+      let newDeploymentPayload = {
+        commit_sha: 'abc123xyz',
+        image: 'docker.io/image',
+        entrypoint: 'python3'
+      };
+      let expectedExtraPayload = {
+        data: {
+          deployment: newDeploymentPayload
+        }
+      };
+      function subject(mid, p, s,f) {
+          projectServiceClient.createDeployment(mid, p, s,f);
+      }
+
+      testProjectServiceApi(expectedProjectServicePath, expectedProjectServiceSendMethod, subject, expectedExtraPayload, expectedModelId, newDeploymentPayload);        
+    });
+
+    describe('.deployment', () => {
+      let expectedModelId = "abc-123-xyz";
+      let expectedDeploymentId = 'xyz-abc-123';
+      let expectedProjectServicePath = '/api/v1/ai_models/'+expectedModelId+'/deployments/'+expectedDeploymentId;
+      let expectedProjectServiceSendMethod = 'get'
+
+      function subject(mid, did, s,f) {
+          projectServiceClient.deployment(mid, did, s,f);
+      }
+
+      testProjectServiceApi(expectedProjectServicePath, expectedProjectServiceSendMethod, subject, {}, expectedModelId, expectedDeploymentId);
+    });
 });

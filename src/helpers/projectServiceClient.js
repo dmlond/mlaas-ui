@@ -192,5 +192,44 @@ const projectServiceClient = {
             failureHandler
         ) 
     },
+
+    deployments(modelId, successHandler, failureHandler) {
+        var deploymentIndex = `${config.proxy_uri}/api/v1/ai_models/${modelId}/deployments`;
+        this.send(
+            {
+                url: deploymentIndex,
+                method: 'get'
+            },
+            successHandler,
+            failureHandler
+        )            
+    },
+
+    deployment(modelId, deploymentId, successHandler, failureHandler) {
+        var deploymentProfile = `${config.proxy_uri}/api/v1/ai_models/${modelId}/deployments/${deploymentId}`;
+        this.send(
+            {
+                url: deploymentProfile,
+                method: 'get'
+            },
+            successHandler,
+            failureHandler
+        )
+    },
+
+    createDeployment(modelId, payload, successHandler, failureHandler) {
+        var deploymentIndex = `${config.proxy_uri}/api/v1/ai_models/${modelId}/deployments`;
+        this.send(
+            {
+                url: deploymentIndex,
+                method: 'post',
+                data: {
+                    deployment: payload
+                }
+            },
+            successHandler,
+            failureHandler
+        ) 
+    },
 };
 export default projectServiceClient;
