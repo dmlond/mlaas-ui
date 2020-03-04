@@ -72,7 +72,7 @@ class ProjectForm extends Component {
         </div> : <div></div>;
     
         let renderBody = <Card
-            height="90vw"
+            height="40vw"
             width="90vw"
         >
             <CardHeader title={ title } />
