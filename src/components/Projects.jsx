@@ -47,7 +47,9 @@ class Projects extends Component {
     handleFailedProjectLoad(errorMessage) {
         this.setState({
             hasError: true,
-            errorMessage: errorMessage
+            error: errorMessage.error,
+            errorReason: errorMessage.reason,
+            errorSuggestion: errorMessage.suggestion
         });
     }
 
@@ -88,11 +90,16 @@ class Projects extends Component {
     render() {
         var renderBody;
 
-        var loadError = this.state.hasError ? <p>Error Loading Projects: {this.state.errorMessage}</p> : <div></div>;
+        let errorMessage = this.state.hasError ? <div>
+            <p>Error: {this.state.error}</p>
+            <p>Reason: {this.state.errorReason}</p>
+            <p>Suggestion: {this.state.errorSuggestion}</p>
+        </div> : <div></div>;
         if (authHelper.isLoggedIn()) {
           renderBody = <div>
               <Modal
                 active={this.state.newProjectClicked}
+                escKeyDown={this.handleCloseNewProject}
               >
                 <ProjectForm
                     onCancel={this.handleCloseNewProject}
@@ -120,7 +127,7 @@ class Projects extends Component {
                             );                    
                         })} 
                     </List>
-                    {loadError}
+                    {errorMessage}
                 </CardBody>
             </Card>
           </div>
