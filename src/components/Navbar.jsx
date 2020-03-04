@@ -15,7 +15,7 @@ class Navbar extends Component {
                 <AppHeader
                     width="calc(100% - 32px)"
                     backgroundColor="rgba(74,144,226,1)"
-                    childrenLeft={<div><Link to="/">Home </Link><SolidDivider/><Link to="/projects">Projects</Link></div>}
+                    childrenLeft={<div><Link to="/">Home </Link><SolidDivider/><Link to="/projects">Projects</Link><SolidDivider/><Link to="/models">Models</Link></div>}
                     childrenRight={
                         <Dropdown
                               buttonLabel={<IconMenu />}
