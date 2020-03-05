@@ -3,7 +3,7 @@ import { withRouter } from "react-router-dom";
 import authHelper from '../helpers/authHelper';
 import projectServiceClient from '../helpers/projectServiceClient';
 import config from "../config/authconfig.js";
-import { Spinner, Input, ActionButton, IconTrashcan, Button } from "@duke-office-research-informatics/dracs";
+import { Card, CardHeader, CardBody, Spinner, Input, ActionButton, IconTrashcan, Button } from "@duke-office-research-informatics/dracs";
 import ModelManagementMenu from "./ModelManagementMenu";
 
 class ModelEnvironment extends Component {
@@ -294,7 +294,18 @@ class ModelEnvironment extends Component {
 
                 renderBody = <div>
                     <ModelManagementMenu model_id={modelId}>
-                        {renderEnvironment}
+                        <Card>
+                            <CardHeader title="Environment Variables">
+                            </CardHeader>
+                            <CardBody>
+                                <p style={{"marginLeft": 10}}>
+                                    Environment Variables are sets of key-value
+                                    pairs that are submitted with each deployment
+                                    of a model.
+                                </p>
+                                {renderEnvironment}
+                            </CardBody>
+                        </Card>
                     </ModelManagementMenu>
                 </div>
             }
