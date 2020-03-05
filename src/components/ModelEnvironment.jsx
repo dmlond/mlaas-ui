@@ -3,7 +3,7 @@ import { withRouter } from "react-router-dom";
 import authHelper from '../helpers/authHelper';
 import projectServiceClient from '../helpers/projectServiceClient';
 import config from "../config/authconfig.js";
-import { Spinner, Input, ActionButton, IconTrashcan } from "@duke-office-research-informatics/dracs";
+import { Spinner, Input, ActionButton, IconTrashcan, Button } from "@duke-office-research-informatics/dracs";
 import ModelManagementMenu from "./ModelManagementMenu";
 
 class ModelEnvironment extends Component {
@@ -19,6 +19,8 @@ class ModelEnvironment extends Component {
         this.environmentKeyChange = this.environmentKeyChange.bind(this);
         this.environmentValueChange = this.environmentValueChange.bind(this);
         this.newEntry = this.newEntry.bind(this);
+        this.submitEnvironment = this.submitEnvironment.bind(this);
+        this.toggleShowValues = this.toggleShowValues.bind(this);
 
         this.state = {
             isLoading: true,
@@ -27,7 +29,10 @@ class ModelEnvironment extends Component {
             focus: "key-0",
             environmentKeys: [],
             environmentValues: [],
-            currentEntries: 0
+            currentEntries: 0,
+            showValues: true,
+            valueType: "text",
+            showValuesLabel: "Hide Values"
         }
     }
 
@@ -56,7 +61,10 @@ class ModelEnvironment extends Component {
             environment: data,
             environmentKeys: keyList,
             environmentValues: Object.values(data),
-            currentEntries: keyList.length
+            currentEntries: keyList.length,
+            showValues: false,
+            valueType: "password",
+            showValuesLabel: "Reveal Values"
         };
         this.setState(
             {...environmentLoad, ...extraSettings}
@@ -145,6 +153,30 @@ class ModelEnvironment extends Component {
         });
     }
 
+    submitEnvironment(event) {
+        event.preventDefault();
+        console.log("submitting");
+    }
+
+    toggleShowValues(event) {
+        event.preventDefault();
+        let showValues = !this.state.showValues;
+        if (showValues) {
+            this.setState({
+                showValues: showValues,
+                valueType: "text",
+                showValuesLabel: "Hide Values"
+            });
+        }
+        else {
+            this.setState({
+                showValues: showValues,
+                valueType: "password",
+                showValuesLabel: "Reveal Values"
+            });
+        }
+    }
+
     newEntry(index, withTrashcan) {
         if (withTrashcan){
             return (
@@ -168,6 +200,8 @@ class ModelEnvironment extends Component {
                     }}>
                         <Input
                             id={"value-"+index}
+                            type={this.state.valueType}
+                            readOnly={!this.state.showValues}
                             name={"value-"+index}
                             autoFocus={"value-"+index === this.state.focus}
                             placeholder="Input variable value"
@@ -246,6 +280,24 @@ class ModelEnvironment extends Component {
                 }}>
                     {kvEntries}
                     {this.newEntry(newKVIndex)}
+                    <div style={{
+                        "margin": 0,
+                        "display": "inline-flex"
+                    }}>
+                        <Button
+                            label="Submit"
+                            onClick={this.submitEnvironment}
+                        />
+                    </div>
+                    <div style={{
+                        "display": "inline-flex",
+                        "marginLeft": 10
+                    }}>
+                        <Button
+                            label={this.state.showValuesLabel}
+                            onClick={this.toggleShowValues}
+                        />
+                    </div>
                 </ul>
 
                 renderBody = <div>
