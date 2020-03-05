@@ -18,6 +18,7 @@ class ModelEnvironment extends Component {
         this.handleSuccessfulEnvironmentUpdate = this.handleSuccessfulEnvironmentUpdate.bind(this);
         this.environmentKeyChange = this.environmentKeyChange.bind(this);
         this.environmentValueChange = this.environmentValueChange.bind(this);
+        this.newEntry = this.newEntry.bind(this);
 
         this.state = {
             isLoading: true,
@@ -144,6 +145,83 @@ class ModelEnvironment extends Component {
         });
     }
 
+    newEntry(index, withTrashcan) {
+        if (withTrashcan){
+            return (
+                <li key={index}>
+                    <div style={{
+                        "margin": 0,
+                        "display": "inline-flex"
+                    }}>
+                        <Input
+                            id={"key-"+index}
+                            autoFocus={"key-"+index === this.state.focus}
+                            name={"key-"+index}
+                            placeholder="Input variable key"
+                            onChange={this.environmentKeyChange}
+                            value={this.state.environmentKeys[index] ? this.state.environmentKeys[index] : ""}
+                        />
+                    </div>
+                    <div style={{
+                        "display": "inline-flex",
+                        "marginLeft": 10
+                    }}>
+                        <Input
+                            id={"value-"+index}
+                            name={"value-"+index}
+                            autoFocus={"value-"+index === this.state.focus}
+                            placeholder="Input variable value"
+                            onChange={this.environmentValueChange}
+                            value={this.state.environmentValues[index] ? this.state.environmentValues[index] : ""}
+                        />
+                    </div>
+                    <div style={{
+                        "display": "inline-flex",
+                        "marginLeft": 10
+                    }}>
+                        <ActionButton
+                            onClick={this.removeEnvironmentEntry.bind(this, index)}
+                        >
+                            <IconTrashcan/>
+                        </ActionButton>
+                    </div>
+                </li>
+            )
+        }
+        else {
+            return (
+                <li key={index}>
+                    <div style={{
+                        "margin": 0,
+                        "display": "inline-flex"
+                    }}>
+                        <Input
+                            id={"key-"+index}
+                            autoFocus={"key-"+index === this.state.focus}
+                            name={"key-"+index}
+                            placeholder="Input variable key"
+                            onChange={this.environmentKeyChange}
+                            value={this.state.environmentKeys[index] ? this.state.environmentKeys[index] : ""}
+                        />
+                    </div>
+                    <div style={{
+                        "display": "inline-flex",
+                        "marginLeft": 10
+                    }}>
+                        <Input
+                            id={"value-"+index}
+                            name={"value-"+index}
+                            autoFocus={"value-"+index === this.state.focus}
+                            placeholder="Input variable value"
+                            onChange={this.environmentValueChange}
+                            value={this.state.environmentValues[index] ? this.state.environmentValues[index] : ""}
+                        />
+                    </div>
+                </li>
+            )
+        }
+    }
+
     render() {
         let modelId = this.props.match.params.modelid;
         var renderBody;
@@ -155,44 +233,7 @@ class ModelEnvironment extends Component {
             else {
                 var newKVIndex = 0;
                 var kvEntries = [...Array(this.state.currentEntries).keys()].map(() => {
-                    var kvEntry = <li key={newKVIndex}>
-                         <div style={{
-                             "margin": 0,
-                             "display": "inline-flex"
-                         }}>
-                             <Input
-                                id={"key-"+newKVIndex}
-                                autoFocus={"key-"+newKVIndex === this.state.focus}
-                                name={"key-"+newKVIndex}
-                                placeholder="Input variable key"
-                                onChange={this.environmentKeyChange}
-                                value={this.state.environmentKeys[newKVIndex] ? this.state.environmentKeys[newKVIndex] : ""}
-                             />
-                         </div>
-                         <div style={{
-                             "display": "inline-flex",
-                             "marginLeft": 10
-                         }}>
-                             <Input
-                                id={"value-"+newKVIndex}
-                                name={"value-"+newKVIndex}
-                                autoFocus={"value-"+newKVIndex === this.state.focus}
-                                placeholder="Input variable value"
-                                onChange={this.environmentValueChange}
-                                value={this.state.environmentValues[newKVIndex] ? this.state.environmentValues[newKVIndex] : ""}
-                             />
-                         </div>
-                         <div style={{
-                             "display": "inline-flex",
-                             "marginLeft": 10
-                         }}>
-                             <ActionButton
-                                onClick={this.removeEnvironmentEntry.bind(this, newKVIndex)}
-                            >
-                                <IconTrashcan/>
-                            </ActionButton>
-                        </div>
-                     </li>;
+                    var kvEntry = this.newEntry(newKVIndex, true);
                      newKVIndex = newKVIndex + 1;
                      return (
                          kvEntry
@@ -204,34 +245,7 @@ class ModelEnvironment extends Component {
                         "listStyle": "none"
                 }}>
                     {kvEntries}
-                    <li>
-                        <div style={{
-                            "margin": 0,
-                            "display": "inline-flex"
-                        }}>
-                            <Input
-                                id={"key-"+newKVIndex}
-                                name={"key-"+newKVIndex}
-                                autoFocus={"key-"+newKVIndex === this.state.focus}
-                                placeholder="Input variable key"
-                                onChange={this.environmentKeyChange}
-                                value={this.state.environmentKeys[newKVIndex] ? this.state.environmentKeys[newKVIndex] : ""}
-                            />
-                        </div>
-                        <div style={{
-                            "display": "inline-flex",
-                            "marginLeft": 10
-                        }}>
-                            <Input
-                                id={"value-"+newKVIndex}
-                                name={"value-"+newKVIndex}
-                                autoFocus={"value-"+newKVIndex === this.state.focus}
-                                placeholder="Input variable value"
-                                onChange={this.environmentValueChange}
-                                value={this.state.environmentValues[newKVIndex] ? this.state.environmentValues[newKVIndex] : ""}
-                            />
-                        </div>
-                    </li>
+                    {this.newEntry(newKVIndex)}
                 </ul>
 
                 renderBody = <div>
