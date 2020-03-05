@@ -12,10 +12,6 @@ class ModelEnvironment extends Component {
         this.loadEnvironment = this.loadEnvironment.bind(this);
         this.handleSuccessfulEnvironmentLoad = this.handleSuccessfulEnvironmentLoad.bind(this);
         this.handleFailedEnvironmentLoad = this.handleFailedEnvironmentLoad.bind(this);
-        this.handleSetEnvironmentClick = this.handleSetEnvironmentClick.bind(this);
-        this.handleCloseSetEnvironment = this.handleCloseSetEnvironment.bind(this);
-        this.handleSetEnvironmentSubmission = this.handleSetEnvironmentSubmission.bind(this);
-        this.handleSuccessfulEnvironmentUpdate = this.handleSuccessfulEnvironmentUpdate.bind(this);
         this.environmentKeyChange = this.environmentKeyChange.bind(this);
         this.environmentValueChange = this.environmentValueChange.bind(this);
         this.newEntry = this.newEntry.bind(this);
@@ -25,7 +21,6 @@ class ModelEnvironment extends Component {
         this.state = {
             isLoading: true,
             hasError: false,
-            setEnvironmentClicked: false,
             focus: "key-0",
             environmentKeys: [],
             environmentValues: [],
@@ -54,21 +49,28 @@ class ModelEnvironment extends Component {
         );
     }
 
-    handleSuccessfulEnvironmentLoad(data, extraSettings) {
-        let keyList = Object.keys(data);
-        let environmentLoad = {
-            isLoading: false,
-            environment: data,
-            environmentKeys: keyList,
-            environmentValues: Object.values(data),
-            currentEntries: keyList.length,
-            showValues: false,
-            valueType: "password",
-            showValuesLabel: "Reveal Values"
-        };
-        this.setState(
-            {...environmentLoad, ...extraSettings}
-        );
+    handleSuccessfulEnvironmentLoad(data) {
+        let newEnvironment = data.variables;
+        let keyList = Object.keys(newEnvironment);
+        if (keyList.length > 0) {
+            this.setState({
+                isLoading: false,
+                environmentKeys: keyList,
+                environmentValues: Object.values(newEnvironment),
+                currentEntries: keyList.length,
+                showValues: false,
+                valueType: "password",
+                showValuesLabel: "Reveal Values"
+            });
+        }
+        else {
+            this.setState({
+                isLoading: false,
+                environmentValues: [],
+                environmentKeys: [],
+                currentEntries: 0
+            });
+        }
     }
 
     handleFailedEnvironmentLoad(errorMessage) {
@@ -80,41 +82,18 @@ class ModelEnvironment extends Component {
                 currentEntries: 0
             });
         } else {
-            this.setState({
-                isLoading: false,
-                hasError: true,
-                error: errorMessage.error,
-                errorReason: errorMessage.reason,
-                errorSuggestion: errorMessage.suggestion           
-            });
+            this.handleFailedEnvironmentUpdate(errorMessage)
         }
     }
 
-    handleSetEnvironmentClick(event) {
-        event.preventDefault();
+    handleFailedEnvironmentUpdate(errorMessage) {
         this.setState({
-            setEnvironmentClicked: true
+            isLoading: false,
+            hasError: true,
+            error: errorMessage.error,
+            errorReason: errorMessage.reason,
+            errorSuggestion: errorMessage.suggestion           
         });
-    }
-
-    handleCloseSetEnvironment(event) {
-        event.preventDefault();
-        this.setState({
-            setEnvironmentClicked: false
-        });
-    }
-
-    handleSetEnvironmentSubmission(updatePayload, errorHandler) {
-        projectServiceClient.setEnvironment(
-            this.props.match.params.modelid,
-            updatePayload,
-            this.handleSuccessfulEnvironmentUpdate,
-            errorHandler
-        );
-    }
-
-    handleSuccessfulEnvironmentUpdate(data) {
-        this.handleSuccessfulEnvironmentLoad(data, {setEnvironmentClicked: false});
     }
 
     environmentKeyChange(value, key) {
@@ -155,7 +134,20 @@ class ModelEnvironment extends Component {
 
     submitEnvironment(event) {
         event.preventDefault();
-        console.log("submitting");
+        var environment = {};
+        for (let curIndex = 0; curIndex < this.state.environmentKeys.length; curIndex++) {
+            let thisKey = this.state.environmentKeys[curIndex];
+            if (thisKey){
+                let thisValue = this.state.environmentValues[curIndex];
+                environment[thisKey] = thisValue;
+            }
+        }
+        projectServiceClient.setEnvironment(
+            this.props.match.params.modelid,
+            environment,
+            this.handleSuccessfulEnvironmentLoad,
+            this.handleFailedEnvironmentUpdate
+        );
     }
 
     toggleShowValues(event) {
@@ -200,8 +192,8 @@ class ModelEnvironment extends Component {
                     }}>
                         <Input
                             id={"value-"+index}
-                            type={this.state.valueType}
-                            readOnly={!this.state.showValues}
+                            type={("value-"+index === this.state.focus || !this.state.environmentValues[index]) ? "text" : this.state.valueType}
+                            readOnly={("value-"+index === this.state.focus || !this.state.environmentValues[index]) ? false : !this.state.showValues}
                             name={"value-"+index}
                             autoFocus={"value-"+index === this.state.focus}
                             placeholder="Input variable value"

@@ -320,14 +320,14 @@ describe('projectServiceClient', () => {
       let expectedProjectServicePath = '/api/v1/ai_models'+"/"+expectedModelId+'/environment';
       let expectedProjectServiceSendMethod = 'post';
       let environmentPayload = {
-        variables:{
-          PIPELINE_USER: "theUserz",
-          PIPELINE_PASSWORD: "a1bn23"
-        }
+        PIPELINE_USER: "theUserz",
+        PIPELINE_PASSWORD: "a1bn23"
       };
       let expectedExtraPayload = {
         data: {
-          environment: environmentPayload
+          environment: {
+            variables: environmentPayload
+          }
         }
       };
       function subject(mid, p, s,f) {

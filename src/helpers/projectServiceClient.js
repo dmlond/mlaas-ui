@@ -185,7 +185,9 @@ const projectServiceClient = {
                 url: environmentUrl,
                 method: 'post',
                 data: {
-                    environment: payload
+                    environment: {
+                        variables: payload
+                    }
                 }
             },
             successHandler,
