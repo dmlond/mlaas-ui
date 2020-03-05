@@ -3,8 +3,8 @@ import { withRouter } from "react-router-dom";
 import authHelper from '../helpers/authHelper';
 import projectServiceClient from '../helpers/projectServiceClient';
 import config from "../config/authconfig.js";
-import {Link} from "react-router-dom";
-import { Spinner } from "@duke-office-research-informatics/dracs";
+import { Spinner, Input, ActionButton, IconTrashcan } from "@duke-office-research-informatics/dracs";
+import ModelManagementMenu from "./ModelManagementMenu";
 
 class ModelEnvironment extends Component {
     constructor(props) {
@@ -16,12 +16,17 @@ class ModelEnvironment extends Component {
         this.handleCloseSetEnvironment = this.handleCloseSetEnvironment.bind(this);
         this.handleSetEnvironmentSubmission = this.handleSetEnvironmentSubmission.bind(this);
         this.handleSuccessfulEnvironmentUpdate = this.handleSuccessfulEnvironmentUpdate.bind(this);
+        this.environmentKeyChange = this.environmentKeyChange.bind(this);
+        this.environmentValueChange = this.environmentValueChange.bind(this);
 
         this.state = {
             isLoading: true,
             hasError: false,
             setEnvironmentClicked: false,
-            schedule: null
+            focus: "key-0",
+            environmentKeys: [],
+            environmentValues: [],
+            currentEntries: 0
         }
     }
 
@@ -43,18 +48,27 @@ class ModelEnvironment extends Component {
         );
     }
 
-    handleSuccessfulEnvironmentLoad(data) {
-        this.setState({
+    handleSuccessfulEnvironmentLoad(data, extraSettings) {
+        let keyList = Object.keys(data);
+        let environmentLoad = {
             isLoading: false,
-            schedule: data
-        });
+            environment: data,
+            environmentKeys: keyList,
+            environmentValues: Object.values(data),
+            currentEntries: keyList.length
+        };
+        this.setState(
+            {...environmentLoad, ...extraSettings}
+        );
     }
 
     handleFailedEnvironmentLoad(errorMessage) {
         if (errorMessage.error.match(/.*not.*found/)) {
             this.setState({
                 isLoading: false,
-                needsEnvironment: true
+                environmentValues: [],
+                environmentKeys: [],
+                currentEntries: 0
             });
         } else {
             this.setState({
@@ -83,21 +97,55 @@ class ModelEnvironment extends Component {
 
     handleSetEnvironmentSubmission(updatePayload, errorHandler) {
         projectServiceClient.setEnvironment(
-            this.state.model.id,
+            this.props.match.params.modelid,
             updatePayload,
-            this.handleSuccessfulModelUpdate,
+            this.handleSuccessfulEnvironmentUpdate,
             errorHandler
         );
     }
 
     handleSuccessfulEnvironmentUpdate(data) {
+        this.handleSuccessfulEnvironmentLoad(data, {setEnvironmentClicked: false});
+    }
+
+    environmentKeyChange(value, key) {
+        let index = parseInt(key.split('-')[1]);
+        var keyList = this.state.environmentKeys;
+        keyList[index] = value;
+
         this.setState({
-            setEnvironmentClicked: false,
-            schedule: data
+            environmentKeys: keyList,
+            focus: key,
+            currentEntries: (this.state.currentEntries < index + 1) ? index + 1 : this.state.currentEntries
+        })
+    }
+
+    environmentValueChange(value, key) {
+        let index = parseInt(key.split('-')[1]);
+        var valueList = this.state.environmentValues;
+        valueList[index] = value;
+
+        this.setState({
+            environmentValues: valueList,
+            focus: key,
+            currentEntries: (this.state.currentEntries < index + 1) ? index + 1 : this.state.currentEntries
+        })
+    }
+
+    removeEnvironmentEntry(index) {
+        var keyList = this.state.environmentKeys;
+        keyList.splice(index,1);
+        var valueList = this.state.environmentValues;
+        valueList.splice(index,1);
+        this.setState({
+            environmentKeys: keyList,
+            environmentValues: valueList,
+            currentEntries: this.state.currentEntries - 1
         });
     }
 
     render() {
+        let modelId = this.props.match.params.modelid;
         var renderBody;
     
         if (authHelper.isLoggedIn()) {
@@ -105,10 +153,91 @@ class ModelEnvironment extends Component {
                 renderBody = <div><Spinner /></div>
             }
             else {
-                let renderEnvironment = this.state.needsEnvironment ? <p>No Environment is Set</p> : <p>Schedule</p>
+                var newKVIndex = 0;
+                var kvEntries = [...Array(this.state.currentEntries).keys()].map(() => {
+                    var kvEntry = <li key={newKVIndex}>
+                         <div style={{
+                             "margin": 0,
+                             "display": "inline-flex"
+                         }}>
+                             <Input
+                                id={"key-"+newKVIndex}
+                                autoFocus={"key-"+newKVIndex === this.state.focus}
+                                name={"key-"+newKVIndex}
+                                placeholder="Input variable key"
+                                onChange={this.environmentKeyChange}
+                                value={this.state.environmentKeys[newKVIndex] ? this.state.environmentKeys[newKVIndex] : ""}
+                             />
+                         </div>
+                         <div style={{
+                             "display": "inline-flex",
+                             "marginLeft": 10
+                         }}>
+                             <Input
+                                id={"value-"+newKVIndex}
+                                name={"value-"+newKVIndex}
+                                autoFocus={"value-"+newKVIndex === this.state.focus}
+                                placeholder="Input variable value"
+                                onChange={this.environmentValueChange}
+                                value={this.state.environmentValues[newKVIndex] ? this.state.environmentValues[newKVIndex] : ""}
+                             />
+                         </div>
+                         <div style={{
+                             "display": "inline-flex",
+                             "marginLeft": 10
+                         }}>
+                             <ActionButton
+                                onClick={this.removeEnvironmentEntry.bind(this, newKVIndex)}
+                            >
+                                <IconTrashcan/>
+                            </ActionButton>
+                        </div>
+                     </li>;
+                     newKVIndex = newKVIndex + 1;
+                     return (
+                         kvEntry
+                     );
+                });
+         
+                var renderEnvironment = <ul 
+                    style={{
+                        "listStyle": "none"
+                }}>
+                    {kvEntries}
+                    <li>
+                        <div style={{
+                            "margin": 0,
+                            "display": "inline-flex"
+                        }}>
+                            <Input
+                                id={"key-"+newKVIndex}
+                                name={"key-"+newKVIndex}
+                                autoFocus={"key-"+newKVIndex === this.state.focus}
+                                placeholder="Input variable key"
+                                onChange={this.environmentKeyChange}
+                                value={this.state.environmentKeys[newKVIndex] ? this.state.environmentKeys[newKVIndex] : ""}
+                            />
+                        </div>
+                        <div style={{
+                            "display": "inline-flex",
+                            "marginLeft": 10
+                        }}>
+                            <Input
+                                id={"value-"+newKVIndex}
+                                name={"value-"+newKVIndex}
+                                autoFocus={"value-"+newKVIndex === this.state.focus}
+                                placeholder="Input variable value"
+                                onChange={this.environmentValueChange}
+                                value={this.state.environmentValues[newKVIndex] ? this.state.environmentValues[newKVIndex] : ""}
+                            />
+                        </div>
+                    </li>
+                </ul>
+
                 renderBody = <div>
-                    <Link to={"/models/"+this.props.match.params.modelid}>Model</Link>
-                    {renderEnvironment}
+                    <ModelManagementMenu model_id={modelId}>
+                        {renderEnvironment}
+                    </ModelManagementMenu>
                 </div>
             }
         }
