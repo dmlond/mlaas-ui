@@ -4,7 +4,7 @@ import projectServiceClient from '../helpers/projectServiceClient';
 import ProjectForm from './ProjectForm';
 
 import config from "../config/authconfig.js";
-import { Modal, List, DoubleLineListItem, Card, CardHeader, CardBody, Button } from "@duke-office-research-informatics/dracs";
+import { Modal, List, DoubleLineListItem, Card, CardHeader, CardBody, Button, Spinner } from "@duke-office-research-informatics/dracs";
 
 class Projects extends Component {
     constructor(props) {
@@ -18,17 +18,19 @@ class Projects extends Component {
         this.handleSuccessfulProjectCreation = this.handleSuccessfulProjectCreation.bind(this);
 
         this.state = {
-            projectCreationHasError: false,
+            isLoading: true,
+            hasError: false,
             newProjectClicked: false,
             projects: []
         };
     }
 
     componentDidMount() {
-        if (!(authHelper.isLoggedIn())) {
+        if (authHelper.isLoggedIn()) {
+            this.loadProjects();
+        } else {
             window.location.assign(config['oauth_base_uri']+"/authorize?response_type=code&client_id="+config['oauth_client_id']+"&state="+window.location.pathname+"&redirect_uri="+window.location.origin+'/login');
         }
-        this.loadProjects();
     }
 
     loadProjects() {
@@ -40,12 +42,14 @@ class Projects extends Component {
 
     handleSuccessfulProjectLoad(data) {
         this.setState({
+            isLoading: false,
             projects: data
         });
     }
 
     handleFailedProjectLoad(errorMessage) {
         this.setState({
+            isLoading: false,
             hasError: true,
             error: errorMessage.error,
             errorReason: errorMessage.reason,
@@ -96,41 +100,46 @@ class Projects extends Component {
             <p>Suggestion: {this.state.errorSuggestion}</p>
         </div> : <div></div>;
         if (authHelper.isLoggedIn()) {
-          renderBody = <div>
-              <Modal
-                active={this.state.newProjectClicked}
-                escKeyDown={this.handleCloseNewProject}
-              >
-                <ProjectForm
-                    onCancel={this.handleCloseNewProject}
-                    onSubmit={this.handleProjectSubmission}
-                />
-              </Modal>
-              <Card>
-                <CardHeader title="Projects">
-                    <Button 
-                        label="New Project" 
-                        onClick={this.handleNewProjectClick}
-                    />
-                </CardHeader>
-                <CardBody>
-                    <List>
-                        { this.state.projects.map(project => {
-                            return(
-                                <DoubleLineListItem 
-                                    key={project.id}
-                                    lineOne={project.name}
-                                    lineTwo={project.description}
-                                    clickable={true}
-                                    onClick={this.handleProjectSelection.bind(this,project.id)}
-                                />
-                            );                    
-                        })} 
-                    </List>
-                    {errorMessage}
-                </CardBody>
-            </Card>
-          </div>
+            if (this.state.isLoading) {
+                renderBody = <div><Spinner /></div>
+            }
+            else {
+                renderBody = <div>
+                    <Modal
+                        active={this.state.newProjectClicked}
+                        escKeyDown={this.handleCloseNewProject}
+                    >
+                        <ProjectForm
+                            onCancel={this.handleCloseNewProject}
+                            onSubmit={this.handleProjectSubmission}
+                        />
+                    </Modal>
+                    <Card>
+                        <CardHeader title="Projects">
+                            <Button 
+                                label="New Project" 
+                                onClick={this.handleNewProjectClick}
+                            />
+                        </CardHeader>
+                        <CardBody>
+                            <List>
+                                { this.state.projects.map(project => {
+                                    return(
+                                        <DoubleLineListItem 
+                                            key={project.id}
+                                            lineOne={project.name}
+                                            lineTwo={project.description}
+                                            clickable={true}
+                                            onClick={this.handleProjectSelection.bind(this,project.id)}
+                                        />
+                                    );                    
+                                })} 
+                            </List>
+                            {errorMessage}
+                        </CardBody>
+                    </Card>
+                </div>
+            }
         }
         else {
             renderBody = <p></p>
