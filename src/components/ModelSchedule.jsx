@@ -105,10 +105,10 @@ class ModelSchedule extends Component {
         let modelId = this.props.match.params.modelid;
         var renderBody;
         let errorMessage = this.state.hasError ? <div>
-        <p>Error: {this.state.error}</p>
-        <p>Reason: {this.state.errorReason}</p>
-        <p>Suggestion: {this.state.errorSuggestion}</p>
-    </div> : <div></div>;
+            <p>Error: {this.state.error}</p>
+            <p>Reason: {this.state.errorReason}</p>
+            <p>Suggestion: {this.state.errorSuggestion}</p>
+        </div> : <div></div>;
 
         if (authHelper.isLoggedIn()) {
             if (this.state.isLoading) {
