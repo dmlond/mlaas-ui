@@ -3,112 +3,154 @@ import { withRouter } from "react-router-dom";
 import authHelper from '../helpers/authHelper';
 import projectServiceClient from '../helpers/projectServiceClient';
 import config from "../config/authconfig.js";
-import {Link} from "react-router-dom";
-import { Spinner } from "@duke-office-research-informatics/dracs";
+import { Modal, Spinner, Card, CardHeader, CardBody, Button, List, DoubleLineListItem } from "@duke-office-research-informatics/dracs";
+import ModelManagementMenu from "./ModelManagementMenu";
+import DeploymentForm from "./DeploymentForm";
 
-class ModelSchedule extends Component {
+class ModelDeployments extends Component {
     constructor(props) {
         super(props);
-        this.loadSchedule = this.loadSchedule.bind(this);
-        this.handleSuccessfulScheduleLoad = this.handleSuccessfulScheduleLoad.bind(this);
-        this.handleFailedScheduleLoad = this.handleFailedScheduleLoad.bind(this);
-        this.handleUpdateScheduleClick = this.handleUpdateScheduleClick.bind(this);
-        this.handleCloseUpdateSchedule = this.handleCloseUpdateSchedule.bind(this);
-        this.handleUpdateScheduleSubmission = this.handleUpdateScheduleSubmission.bind(this);
-        this.handleSuccessfulScheduleUpdate = this.handleSuccessfulScheduleUpdate.bind(this);
+        this.loadDeployments = this.loadDeployments.bind(this);
+        this.handleSuccessfulDeploymentLoad = this.handleSuccessfulDeploymentLoad.bind(this);
+        this.handleFailedDeploymentLoad = this.handleFailedDeploymentLoad.bind(this);
+        this.handleDeploymentSelection = this.handleDeploymentSelection.bind(this);
+        this.handleNewDeploymentClick = this.handleNewDeploymentClick.bind(this);
+        this.handleCloseNewDeployment = this.handleCloseNewDeployment.bind(this);
+        this.handleDeploymentSubmission = this.handleDeploymentSubmission.bind(this);
+        this.handleSuccessfulDeploymentCreation = this.handleSuccessfulDeploymentCreation.bind(this);
 
         this.state = {
             isLoading: true,
             hasError: false,
-            updateScheduleClicked: false,
-            schedule: null
+            newDeploymentClicked: false,
+            deployments: []
         }
     }
 
     componentDidMount() {
         if (authHelper.isLoggedIn()) {
-            this.loadSchedule();
+            this.loadDeployments();
         }
         else {
             window.location.assign(config.oauth_base_uri+"/authorize?response_type=code&client_id="+config.oauth_client_id+"&state="+window.location.pathname+"&redirect_uri="+window.location.origin+'/login');
         }
     }
 
-    loadSchedule() {
+    loadDeployments() {
         let id = this.props.match.params.modelid;
-        projectServiceClient.schedule(
+        projectServiceClient.deployments(
             id,
-            this.handleSuccessfulScheduleLoad,
-            this.handleFailedScheduleLoad
+            this.handleSuccessfulDeploymentLoad,
+            this.handleFailedDeploymentLoad
         );
     }
 
-    handleSuccessfulScheduleLoad(data) {
+    handleSuccessfulDeploymentLoad(data) {
         this.setState({
             isLoading: false,
-            schedule: data
+            deployments: data
         });
     }
 
-    handleFailedScheduleLoad(errorMessage) {
-        if (errorMessage.error.match(/.*not.*found/)) {
-            this.setState({
-                isLoading: false,
-                needsSchedule: true
-            });
-        } else {
-            this.setState({
-                isLoading: false,
-                hasError: true,
-                error: errorMessage.error,
-                errorReason: errorMessage.reason,
-                errorSuggestion: errorMessage.suggestion           
-            });
-        }
+    handleFailedDeploymentLoad(errorMessage) {
+        this.setState({
+            isLoading: false,
+            hasError: true,
+            error: errorMessage.error,
+            errorReason: errorMessage.reason,
+            errorSuggestion: errorMessage.suggestion           
+        });
     }
 
-    handleUpdateScheduleClick(event) {
+    handleDeploymentSelection(id) {
+        let modelid = this.props.match.params.modelid;
+        window.location.assign(window.location.origin+'/models/'+modelid+'/deployments/'+id);
+    }
+
+    handleNewDeploymentClick(event) {
         event.preventDefault();
         this.setState({
-            updateScheduleClicked: true
+            newDeploymentClicked: true
         });
     }
 
-    handleCloseUpdateSchedule(event) {
+    handleCloseNewDeployment(event) {
         event.preventDefault();
         this.setState({
-            updateScheduleClicked: false
+            newDeploymentClicked: false
         });
     }
 
-    handleUpdateScheduleSubmission(updatePayload, errorHandler) {
-        projectServiceClient.setSchedule(
-            this.state.model.id,
-            updatePayload,
-            this.handleSuccessfulModelUpdate,
+    handleDeploymentSubmission(modelid, payload, errorHandler) {
+        projectServiceClient.createDeployment(
+            modelid,
+            payload,
+            this.handleSuccessfulDeploymentCreation,
             errorHandler
         );
     }
 
-    handleSuccessfulScheduleUpdate(data) {
+    handleSuccessfulDeploymentCreation(data) {
+        const deploymentList = this.state.deployments.concat(data);
         this.setState({
-            updateScheduleClicked: false,
-            schedule: data
+            newDeploymentClicked: false,
+            deployments: deploymentList
         });
     }
 
     render() {
+        let modelId = this.props.match.params.modelid;
         var renderBody;
-    
+        let errorMessage = this.state.hasError ? <div>
+            <p>Error: {this.state.error}</p>
+            <p>Reason: {this.state.errorReason}</p>
+            <p>Suggestion: {this.state.errorSuggestion}</p>
+        </div> : <div></div>;
+
         if (authHelper.isLoggedIn()) {
             if (this.state.isLoading) {
                 renderBody = <div><Spinner /></div>
             }
             else {
-                let renderSchedule = this.state.needsSchedule ? <p>No Schedule is Set</p> : <p>Schedule</p>
+                let renderDeployments = <List>
+                    { this.state.deployments.map(deployment => {
+                        return(
+                            <DoubleLineListItem 
+                                key={deployment.id}
+                                lineOne={deployment.id}
+                                lineTwo={deployment.commit_sha}
+                                clickable={true}
+                                onClick={this.handleDeploymentSelection.bind(this,deployment.id)}
+                            />
+                        );                    
+                    })} 
+                </List>
+
                 renderBody = <div>
-                    <Link to={"/models/"+this.props.match.params.modelid}>Model</Link>
-                    {renderSchedule}
+                    <Modal
+                        active={this.state.newDeploymentClicked}
+                        escKeyDown={this.handleCloseNewDeployment}
+                    >
+                        <DeploymentForm
+                            model_id={modelId}
+                            onCancel={this.handleCloseNewDeployment}
+                            onSubmit={this.handleDeploymentSubmission}
+                        />
+                    </Modal>
+                    <ModelManagementMenu model_id={modelId}>
+                        <Card>
+                            <CardHeader title="Deployments:" >
+                                <Button 
+                                    label="New Deployment" 
+                                    onClick={this.handleNewDeploymentClick}
+                                />
+                            </CardHeader>
+                            <CardBody>
+                                {renderDeployments}
+                                {errorMessage}
+                            </CardBody>
+                        </Card>
+                    </ModelManagementMenu>
                 </div>
             }
         }
@@ -119,4 +161,4 @@ class ModelSchedule extends Component {
     }    
 }
 
-export default withRouter(ModelSchedule);
+export default withRouter(ModelDeployments);
