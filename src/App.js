@@ -10,6 +10,7 @@ import ModelSchedule from "./components/ModelSchedule";
 import ModelEnvironment from "./components/ModelEnvironment";
 import ModelDeployments from "./components/ModelDeployments";
 import Navbar from "./components/Navbar";
+import DeploymentProfile from "./components/DeploymentProfile";
 
 class App extends Component {
   render () {
@@ -24,6 +25,7 @@ class App extends Component {
           <Route exact path="/models" component={Models} />
           <Route path="/models/:modelid/schedule" component={ModelSchedule} />
           <Route path="/models/:modelid/environment" component={ModelEnvironment} />
+          <Route path="/models/:modelid/deployments/:deploymentid" component={DeploymentProfile} />
           <Route path="/models/:modelid/deployments" component={ModelDeployments} />
           <Route path="/models/:modelid" component={ModelProfile} />
         </Switch>
