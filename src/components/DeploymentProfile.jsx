@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { withRouter } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import authHelper from '../helpers/authHelper';
 import projectServiceClient from '../helpers/projectServiceClient';
 import config from "../config/authconfig.js";
@@ -58,6 +58,7 @@ class DeploymentProfile extends Component {
     }
 
     render() {
+        let modelId = this.props.match.params.modelid;
         var renderBody;
         let errorMessage = this.state.hasError ? <div>
             <p>Error: {this.state.error}</p>
@@ -72,11 +73,10 @@ class DeploymentProfile extends Component {
             else {
                 let deploymentProfile = <ul style={{
                     "listStyle": "none"
-                    }}>
+                }}>
                     <li>
                         <div style={{
-                            "margin": 0,
-                            "display": "inline-flex"
+                            "display": "inline-flex"    
                         }}>
                             <h4>Image:</h4>
                         </div>
@@ -89,7 +89,6 @@ class DeploymentProfile extends Component {
                     </li>
                     <li>
                         <div style={{
-                                "margin": 0,
                                 "display": "inline-flex"
                         }}>
                             <h4>Entrypoint:</h4>
@@ -103,7 +102,6 @@ class DeploymentProfile extends Component {
                     </li>
                     <li>
                         <div style={{
-                            "margin": 0,
                             "display": "inline=flex"
                         }}>
                             <h4>Arguments:</h4>
@@ -117,7 +115,9 @@ class DeploymentProfile extends Component {
                     </li>
                 </ul>
                 renderBody = <Card>
-                    <CardHeader title={"Commit "+this.state.deployment.commit_sha} />
+                    <CardHeader title={"Commit "+this.state.deployment.commit_sha} >
+                      <Link to={"/models/"+modelId+'/deployments'}>Back to Deployments</Link>
+                    </CardHeader>
                     <CardBody>
                         { deploymentProfile }
                         {errorMessage}
