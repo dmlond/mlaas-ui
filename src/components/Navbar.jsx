@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import config from "../config/authconfig.js";
 import authHelper from '../helpers/authHelper';
 import {Link} from "react-router-dom";
-import { AppHeader, Dropdown, IconMenu, ActionButton, IconLogout, SolidDivider } from "@duke-office-research-informatics/dracs";
+import { AppHeader, Dropdown, IconMenu, ActionButton, IconLogout } from "@duke-office-research-informatics/dracs";
 
 class Navbar extends Component {
     handleLogout() {
@@ -10,12 +10,13 @@ class Navbar extends Component {
     }
     render() {
         if (authHelper.isLoggedIn()){
+            let navigationMenu = <div style={{"display":"inline-flex", "margin":0,"padding": 0}}><Link to="/">Home </Link><div style={{"marginLeft":10}}><Link to="/projects">Projects</Link></div><div style={{"marginLeft":10}}></div><Link to="/models">Models</Link></div>
             return (
             <div>
                 <AppHeader
                     width="calc(100% - 32px)"
                     backgroundColor="rgba(74,144,226,1)"
-                    childrenLeft={<div><Link to="/">Home </Link><SolidDivider/><Link to="/projects">Projects</Link><SolidDivider/><Link to="/models">Models</Link></div>}
+                    childrenLeft={navigationMenu}
                     childrenRight={
                         <Dropdown
                               buttonLabel={<IconMenu />}
