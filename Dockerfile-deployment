@@ -21,7 +21,15 @@ COPY --from=builder /opt/app-root/src/build /var/www/html
 
 USER root
 # twistlock
-RUN yum update -y sqlite
+RUN yum update -y sqlite \
+      nss-util \
+      nss \
+      nss-tools \
+      nss-softokn \
+      libarchive \
+      nss-softokn-freebl \
+      nss-sysinit \
+      bsdtar
 # required in openshift
 RUN chgrp -R root /var/www/html \
       && chmod -R g=rwx /var/www/html
