@@ -4,6 +4,7 @@ import { List, SingleLineListItem } from "@duke-office-research-informatics/drac
 
 class ModelManagementMenu extends Component {
     render() {
+        let modelBaseUri = "/"+this.props.model.project_name+'/'+this.props.model.name;
         return (
             <ul style={{
                 "listStyle": "none",
@@ -14,22 +15,22 @@ class ModelManagementMenu extends Component {
                 <li>
                     <List>
                         <SingleLineListItem>
-                            <Link to={"/models/"+this.props.model_id}>
+                            <Link to={modelBaseUri}>
                                 Model Profile
                             </Link>
                         </SingleLineListItem>
                         <SingleLineListItem>
-                            <Link to={"/models/"+this.props.model_id+"/schedule"}>
+                            <Link to={modelBaseUri+"/schedule"}>
                                 Schedule
                             </Link>
                         </SingleLineListItem>
                         <SingleLineListItem>
-                            <Link to={"/models/"+this.props.model_id+"/environment"}>
+                            <Link to={modelBaseUri+"/environment"}>
                                 Environment
                             </Link> 
                         </SingleLineListItem>
                         <SingleLineListItem>
-                            <Link to={"/models/"+this.props.model_id+"/deployments"}>
+                            <Link to={modelBaseUri+"/deployments"}>
                                 Deployments
                             </Link> 
                         </SingleLineListItem>

@@ -47,10 +47,10 @@ class ModelProfile extends Component {
         );
     }
 
-    handleSuccessfulModelLoad(data) {
+    handleSuccessfulModelLoad(model) {
         this.setState({
             isLoading: false,
-            model: data
+            model: model
         });
     }
 
@@ -87,10 +87,10 @@ class ModelProfile extends Component {
         );
     }
 
-    handleSuccessfulModelUpdate(data) {
+    handleSuccessfulModelUpdate(model) {
         this.setState({
             updateModelClicked: false,
-            model: data
+            model: model
         });
     }
 
@@ -133,9 +133,12 @@ class ModelProfile extends Component {
                             onSubmit={this.handleUpdateModelSubmission}
                         />
                     </Modal>
-                    <ModelManagementMenu model_id={this.state.model.id}>
+                    <ModelManagementMenu model={this.state.model}>
                         <CookieTrail />
-                        <Card>
+                        <Card
+                            height="40vw"
+                            width="70vw"
+                        >
                             <CardHeader title={ this.state.model.name } >
                                 <Button 
                                     label="Edit" 

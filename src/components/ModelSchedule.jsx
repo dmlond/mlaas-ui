@@ -3,13 +3,16 @@ import { withRouter } from "react-router-dom";
 import authHelper from '../helpers/authHelper';
 import projectServiceClient from '../helpers/projectServiceClient';
 import config from "../config/authconfig.js";
-import { Spinner, List, SingleLineListItem, Modal, Button, Card, CardHeader, CardBody } from "@duke-office-research-informatics/dracs";
+import { Spinner, Modal, Button, Card, CardHeader, CardBody } from "@duke-office-research-informatics/dracs";
 import ModelManagementMenu from "./ModelManagementMenu";
 import ScheduleForm from "./ScheduleForm";
 
 class ModelSchedule extends Component {
     constructor(props) {
         super(props);
+        this.loadModel = this.loadModel.bind(this);
+        this.handleSuccessfulModelLoad = this.handleSuccessfulModelLoad.bind(this);
+        this.handleFailedModelLoad = this.handleFailedModelLoad.bind(this);
         this.loadSchedule = this.loadSchedule.bind(this);
         this.handleSuccessfulScheduleLoad = this.handleSuccessfulScheduleLoad.bind(this);
         this.handleFailedScheduleLoad = this.handleFailedScheduleLoad.bind(this);
@@ -22,33 +25,61 @@ class ModelSchedule extends Component {
             isLoading: true,
             hasError: false,
             updateScheduleClicked: false,
-            schedule: null
+            schedule: null,
+            model: null
         }
     }
 
     componentDidMount() {
         if (authHelper.isLoggedIn()) {
-            this.loadSchedule();
+            this.loadModel();
         }
         else {
             window.location.assign(config.oauth_base_uri+"/authorize?response_type=code&client_id="+config.oauth_client_id+"&state="+window.location.pathname+"&redirect_uri="+window.location.origin+'/login');
         }
     }
 
+    loadModel() {
+        let projectName = this.props.match.params.projectName;
+        let modelName = this.props.match.params.modelName;
+        projectServiceClient.model(
+            projectName,
+            modelName,
+            this.handleSuccessfulModelLoad,
+            this.handleFailedModelLoad
+        );
+    }
+
+    handleSuccessfulModelLoad(model) {
+        this.setState({
+            model: model
+        });
+        this.loadSchedule();
+    }
+
+    handleFailedModelLoad(errorMessage) {
+        this.setState({
+            isLoading: false,
+            hasError: true,
+            error: errorMessage.error,
+            errorReason: errorMessage.reason,
+            errorSuggestion: errorMessage.suggestion           
+        });
+    }
+
     loadSchedule() {
-        let id = this.props.match.params.modelid;
         projectServiceClient.schedule(
-            id,
+            this.state.model.id,
             this.handleSuccessfulScheduleLoad,
             this.handleFailedScheduleLoad
         );
     }
 
-    handleSuccessfulScheduleLoad(data) {
+    handleSuccessfulScheduleLoad(schedule) {
         this.setState({
             isLoading: false,
             needsSchedule: false,
-            schedule: data
+            schedule: schedule
         });
     }
 
@@ -102,14 +133,7 @@ class ModelSchedule extends Component {
     }
 
     render() {
-        let modelId = this.props.match.params.modelid;
         var renderBody;
-        let errorMessage = this.state.hasError ? <div>
-            <p>Error: {this.state.error}</p>
-            <p>Reason: {this.state.errorReason}</p>
-            <p>Suggestion: {this.state.errorSuggestion}</p>
-        </div> : <div></div>;
-
         if (authHelper.isLoggedIn()) {
             if (this.state.isLoading) {
                 renderBody = <div><Spinner /></div>
@@ -121,7 +145,7 @@ class ModelSchedule extends Component {
                     setScheduleButtonLabel = "Set Schedule";
                     renderSchedule = <p>No Schedule is Set</p>
                 }
-                else {
+                else {        
                     setScheduleButtonLabel = "Edit Schedule"
                     let startDate = this.state.schedule.start_date ? 
                       new Date(this.state.schedule.start_date).toLocaleString() : 
@@ -129,30 +153,38 @@ class ModelSchedule extends Component {
                     let endDate = this.state.schedule.end_date ? 
                     new Date(this.state.schedule.end_date).toLocaleString() : 
                     null;
-                    renderSchedule = <List>
-                        <SingleLineListItem>
-                            <h4>Schedule Interval: </h4>{this.state.schedule.schedule_interval}
-                        </SingleLineListItem>                        
-                        <SingleLineListItem>
-                            <h4>Start Date: </h4>{startDate}
-                        </SingleLineListItem>
-                        <SingleLineListItem>
-                            <h4>End Date: </h4>{endDate}
-                        </SingleLineListItem>
-                        <SingleLineListItem>
-                            <h4>Retries: </h4>{this.state.schedule.retries}
-                        </SingleLineListItem>
-                        <SingleLineListItem>
-                            <h4>Retry Delay: </h4>{this.state.schedule.retry_delay}
-                        </SingleLineListItem>
-                        <SingleLineListItem>
-                            <h4>Catchup? </h4>{this.state.schedule.catchup ? 'true' : 'false'}
-                        </SingleLineListItem>
-                        <SingleLineListItem>
-                            <h4>Depends on Past? </h4>{this.state.schedule.depends_on_past ? 'true' : 'false'}
-                        </SingleLineListItem>
-                    </List>
+
+                    renderSchedule =  <ul style={{
+                        "listStyle": "none"
+                    }}>
+                        <li>
+                            <p><b>Schedule Interval:</b> {this.state.schedule.schedule_interval}</p>
+                        </li>                        
+                        <li>
+                            <p><b>Start Date:</b> {startDate}</p>
+                        </li>
+                        <li>
+                            <p><b>End Date:</b> {endDate}</p>
+                        </li>
+                        <li>
+                            <p><b>Retries:</b> {this.state.schedule.retries}</p>
+                        </li>
+                        <li>
+                            <p><b>Retry Delay:</b> {this.state.schedule.retry_delay}</p>
+                        </li>
+                        <li>
+                            <p><b>Catchup?</b> {this.state.schedule.catchup ? 'true' : 'false'}</p>
+                        </li>
+                        <li>
+                            <p><b>Depends on Past?</b> {this.state.schedule.depends_on_past ? 'true' : 'false'}</p>
+                        </li>
+                    </ul>
                 }
+                let errorMessage = this.state.hasError ? <div>
+                    <p>Error: {this.state.error}</p>
+                    <p>Reason: {this.state.errorReason}</p>
+                    <p>Suggestion: {this.state.errorSuggestion}</p>
+                </div> : <div></div>;
                 renderBody = <div>
                     <Modal
                         active={this.state.updateScheduleClicked}
@@ -160,13 +192,16 @@ class ModelSchedule extends Component {
                     >
                         <ScheduleForm
                             schedule={this.state.schedule}
-                            model_id={modelId}
+                            model_id={this.state.model.id}
                             onCancel={this.handleCloseUpdateSchedule}
                             onSubmit={this.handleUpdateScheduleSubmission}
                         />
                     </Modal>
-                    <ModelManagementMenu model_id={modelId}>
-                        <Card>
+                    <ModelManagementMenu model={this.state.model}>
+                        <Card
+                            height="40vw"
+                            width="70vw"
+                        >
                             <CardHeader title="Schedule:" >
                                 <Button 
                                     label={setScheduleButtonLabel} 

@@ -21,11 +21,10 @@ class App extends Component {
           <Route exact path="/" component={Home} />
           <Route exact path="/login" component={Login} />
           <Route exact path="/projects" component={Projects} />
-          {/* <Route exact path="/models" component={Models} /> */}
-          {/* <Route path="/models/:modelid/schedule" component={ModelSchedule} />
-          <Route path="/models/:modelid/environment" component={ModelEnvironment} />
-          <Route path="/models/:modelid/deployments/:deploymentid" component={DeploymentProfile} />
-          <Route path="/models/:modelid/deployments" component={ModelDeployments} /> */}
+          <Route path="/:projectName/:modelName/schedule" component={ModelSchedule} />
+          <Route path="/:projectName/:modelName/environment" component={ModelEnvironment} />
+          <Route path="/:projectName/:modelName/deployments/:deploymentid" component={DeploymentProfile} />
+          <Route path="/:projectName/:modelName/deployments" component={ModelDeployments} />
           <Route path="/:projectName/:modelName" component={ModelProfile} />
           <Route path="/:projectName" component={ProjectProfile} />
         </Switch>
