@@ -126,7 +126,7 @@ class Models extends Component {
     }
 
     handleSuccessfulModelCreation(model) {
-        if (this.props.project && model.project_id != this.props.project.id) {
+        if (this.props.project && model.project_id !== this.props.project.id) {
             window.location.assign(window.location.origin+'/'+model.project_name)
             return;
         }

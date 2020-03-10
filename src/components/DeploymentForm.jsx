@@ -106,7 +106,7 @@ export default class DeploymentForm extends Component {
             payload['arguments'] = this.state.arguments.replace(/^\s+|\s+$/g, '').split(' ');
 
         }
-        this.props.onSubmit(this.props.model_id, payload, this.handleSubmissionError);
+        this.props.onSubmit(payload, this.handleSubmissionError);
     }
 
     handleSubmissionError(errorMessage) {

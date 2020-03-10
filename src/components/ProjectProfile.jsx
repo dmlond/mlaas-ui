@@ -115,12 +115,17 @@ class ProjectProfile extends Component {
                         />
                     </Modal>
                     <Card>
-                        <CardHeader title={ this.state.project.name } >
+                        <CardHeader title={this.state.project.name}>
                             <Button 
                                 label="Edit" 
                                 onClick={this.handleUpdateProjectClick}
                             />
                         </CardHeader>
+                        <CardBody >
+                            {this.state.project.description}
+                        </CardBody>
+                    </Card>
+                    <Card>
                         <CardBody>
                             <Models project={this.state.project } />
                         </CardBody>

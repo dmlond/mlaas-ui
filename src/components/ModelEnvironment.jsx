@@ -5,6 +5,7 @@ import projectServiceClient from '../helpers/projectServiceClient';
 import config from "../config/authconfig.js";
 import { Card, CardHeader, CardBody, Spinner, Input, ActionButton, IconTrashcan, Button } from "@duke-office-research-informatics/dracs";
 import ModelManagementMenu from "./ModelManagementMenu";
+import CookieTrail from './CookieTrail';
 
 class ModelEnvironment extends Component {
     constructor(props) {
@@ -15,6 +16,7 @@ class ModelEnvironment extends Component {
         this.loadEnvironment = this.loadEnvironment.bind(this);
         this.handleSuccessfulEnvironmentLoad = this.handleSuccessfulEnvironmentLoad.bind(this);
         this.handleFailedEnvironmentLoad = this.handleFailedEnvironmentLoad.bind(this);
+        this.handleFailedEnvironmentUpdate = this.handleFailedEnvironmentUpdate.bind(this);
         this.environmentKeyChange = this.environmentKeyChange.bind(this);
         this.environmentValueChange = this.environmentValueChange.bind(this);
         this.newEntry = this.newEntry.bind(this);
@@ -173,7 +175,7 @@ class ModelEnvironment extends Component {
             }
         }
         projectServiceClient.setEnvironment(
-            this.props.match.params.modelid,
+            this.state.model.id,
             environment,
             this.handleSuccessfulEnvironmentLoad,
             this.handleFailedEnvironmentUpdate
@@ -327,6 +329,7 @@ class ModelEnvironment extends Component {
                 </div> : <div></div>;
                 renderBody = <div>
                     <ModelManagementMenu model={this.state.model}>
+                        <CookieTrail />
                         <Card>
                             <CardHeader title="Environment Variables">
                             </CardHeader>

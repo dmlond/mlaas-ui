@@ -6,6 +6,7 @@ import config from "../config/authconfig.js";
 import { Spinner, Modal, Button, Card, CardHeader, CardBody } from "@duke-office-research-informatics/dracs";
 import ModelManagementMenu from "./ModelManagementMenu";
 import ScheduleForm from "./ScheduleForm";
+import CookieTrail from './CookieTrail';
 
 class ModelSchedule extends Component {
     constructor(props) {
@@ -198,6 +199,7 @@ class ModelSchedule extends Component {
                         />
                     </Modal>
                     <ModelManagementMenu model={this.state.model}>
+                        <CookieTrail />
                         <Card
                             height="40vw"
                             width="70vw"

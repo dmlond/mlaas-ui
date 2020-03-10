@@ -6,10 +6,14 @@ import config from "../config/authconfig.js";
 import { Modal, Spinner, Card, CardHeader, CardBody, Button, List, DoubleLineListItem } from "@duke-office-research-informatics/dracs";
 import ModelManagementMenu from "./ModelManagementMenu";
 import DeploymentForm from "./DeploymentForm";
+import CookieTrail from './CookieTrail';
 
 class ModelDeployments extends Component {
     constructor(props) {
         super(props);
+        this.loadModel = this.loadModel.bind(this);
+        this.handleSuccessfulModelLoad = this.handleSuccessfulModelLoad.bind(this);
+        this.handleFailedModelLoad = this.handleFailedModelLoad.bind(this);
         this.loadDeployments = this.loadDeployments.bind(this);
         this.handleSuccessfulDeploymentLoad = this.handleSuccessfulDeploymentLoad.bind(this);
         this.handleFailedDeploymentLoad = this.handleFailedDeploymentLoad.bind(this);
@@ -29,26 +33,53 @@ class ModelDeployments extends Component {
 
     componentDidMount() {
         if (authHelper.isLoggedIn()) {
-            this.loadDeployments();
+            this.loadModel();
         }
         else {
             window.location.assign(config.oauth_base_uri+"/authorize?response_type=code&client_id="+config.oauth_client_id+"&state="+window.location.pathname+"&redirect_uri="+window.location.origin+'/login');
         }
     }
 
+    loadModel() {
+        let projectName = this.props.match.params.projectName;
+        let modelName = this.props.match.params.modelName;
+        projectServiceClient.model(
+            projectName,
+            modelName,
+            this.handleSuccessfulModelLoad,
+            this.handleFailedModelLoad
+        );
+    }
+
+    handleSuccessfulModelLoad(model) {
+        this.setState({
+            model: model
+        });
+        this.loadDeployments();
+    }
+
+    handleFailedModelLoad(errorMessage) {
+        this.setState({
+            isLoading: false,
+            hasError: true,
+            error: errorMessage.error,
+            errorReason: errorMessage.reason,
+            errorSuggestion: errorMessage.suggestion           
+        });
+    }
+
     loadDeployments() {
-        let id = this.props.match.params.modelid;
         projectServiceClient.deployments(
-            id,
+            this.state.model.id,
             this.handleSuccessfulDeploymentLoad,
             this.handleFailedDeploymentLoad
         );
     }
 
-    handleSuccessfulDeploymentLoad(data) {
+    handleSuccessfulDeploymentLoad(deployments) {
         this.setState({
             isLoading: false,
-            deployments: data
+            deployments: deployments
         });
     }
 
@@ -63,8 +94,9 @@ class ModelDeployments extends Component {
     }
 
     handleDeploymentSelection(id) {
-        let modelid = this.props.match.params.modelid;
-        window.location.assign(window.location.origin+'/models/'+modelid+'/deployments/'+id);
+        let projectName = this.props.match.params.projectName;
+        let modelName = this.props.match.params.modelName;
+        window.location.assign(window.location.origin+'/'+projectName+'/'+modelName+'/deployments/'+id);
     }
 
     handleNewDeploymentClick(event) {
@@ -81,17 +113,17 @@ class ModelDeployments extends Component {
         });
     }
 
-    handleDeploymentSubmission(modelid, payload, errorHandler) {
+    handleDeploymentSubmission(payload, errorHandler) {
         projectServiceClient.createDeployment(
-            modelid,
+            this.state.model.id,
             payload,
             this.handleSuccessfulDeploymentCreation,
             errorHandler
         );
     }
 
-    handleSuccessfulDeploymentCreation(data) {
-        const deploymentList = this.state.deployments.concat(data);
+    handleSuccessfulDeploymentCreation(deployment) {
+        const deploymentList = this.state.deployments.concat(deployment);
         this.setState({
             newDeploymentClicked: false,
             deployments: deploymentList
@@ -99,7 +131,6 @@ class ModelDeployments extends Component {
     }
 
     render() {
-        let modelId = this.props.match.params.modelid;
         var renderBody;
         let errorMessage = this.state.hasError ? <div>
             <p>Error: {this.state.error}</p>
@@ -114,11 +145,12 @@ class ModelDeployments extends Component {
             else {
                 let renderDeployments = <List>
                     { this.state.deployments.map(deployment => {
+                        let deploymentSummary = <div>{deployment.entrypoint} {deployment.arguments.join(' ')}</div>
                         return(
                             <DoubleLineListItem 
                                 key={deployment.id}
-                                lineOne={deployment.id}
-                                lineTwo={deployment.commit_sha}
+                                lineOne={deployment.commit_sha}
+                                lineTwo={deploymentSummary}
                                 clickable={true}
                                 onClick={this.handleDeploymentSelection.bind(this,deployment.id)}
                             />
@@ -132,12 +164,12 @@ class ModelDeployments extends Component {
                         escKeyDown={this.handleCloseNewDeployment}
                     >
                         <DeploymentForm
-                            model_id={modelId}
                             onCancel={this.handleCloseNewDeployment}
                             onSubmit={this.handleDeploymentSubmission}
                         />
                     </Modal>
-                    <ModelManagementMenu model_id={modelId}>
+                    <ModelManagementMenu model={this.state.model}>
+                        <CookieTrail />
                         <Card>
                             <CardHeader title="Deployments:" >
                                 <Button 

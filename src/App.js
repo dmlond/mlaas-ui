@@ -4,7 +4,6 @@ import Home from "./components/Home";
 import Login from "./components/Login";
 import Projects from "./components/Projects";
 import ProjectProfile from "./components/ProjectProfile";
-import Models from "./components/Models";
 import ModelProfile from "./components/ModelProfile";
 import ModelSchedule from "./components/ModelSchedule";
 import ModelEnvironment from "./components/ModelEnvironment";
