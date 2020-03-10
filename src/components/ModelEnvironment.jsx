@@ -9,6 +9,9 @@ import ModelManagementMenu from "./ModelManagementMenu";
 class ModelEnvironment extends Component {
     constructor(props) {
         super(props);
+        this.loadModel = this.loadModel.bind(this);
+        this.handleSuccessfulModelLoad = this.handleSuccessfulModelLoad.bind(this);
+        this.handleFailedModelLoad = this.handleFailedModelLoad.bind(this);
         this.loadEnvironment = this.loadEnvironment.bind(this);
         this.handleSuccessfulEnvironmentLoad = this.handleSuccessfulEnvironmentLoad.bind(this);
         this.handleFailedEnvironmentLoad = this.handleFailedEnvironmentLoad.bind(this);
@@ -33,24 +36,51 @@ class ModelEnvironment extends Component {
 
     componentDidMount() {
         if (authHelper.isLoggedIn()) {
-            this.loadEnvironment();
+            this.loadModel();
         }
         else {
             window.location.assign(config.oauth_base_uri+"/authorize?response_type=code&client_id="+config.oauth_client_id+"&state="+window.location.pathname+"&redirect_uri="+window.location.origin+'/login');
         }
     }
 
+    loadModel() {
+        let projectName = this.props.match.params.projectName;
+        let modelName = this.props.match.params.modelName;
+        projectServiceClient.model(
+            projectName,
+            modelName,
+            this.handleSuccessfulModelLoad,
+            this.handleFailedModelLoad
+        );
+    }
+
+    handleSuccessfulModelLoad(model) {
+        this.setState({
+            model: model
+        });
+        this.loadEnvironment();
+    }
+
+    handleFailedModelLoad(errorMessage) {
+        this.setState({
+            isLoading: false,
+            hasError: true,
+            error: errorMessage.error,
+            errorReason: errorMessage.reason,
+            errorSuggestion: errorMessage.suggestion           
+        });
+    }
+
     loadEnvironment() {
-        let id = this.props.match.params.modelid;
         projectServiceClient.environment(
-            id,
+            this.state.model.id,
             this.handleSuccessfulEnvironmentLoad,
             this.handleFailedEnvironmentLoad
         );
     }
 
-    handleSuccessfulEnvironmentLoad(data) {
-        let newEnvironment = data.variables;
+    handleSuccessfulEnvironmentLoad(environment) {
+        let newEnvironment = environment.variables;
         let keyList = Object.keys(newEnvironment);
         if (keyList.length > 0) {
             this.setState({
@@ -249,7 +279,6 @@ class ModelEnvironment extends Component {
     }
 
     render() {
-        let modelId = this.props.match.params.modelid;
         var renderBody;
     
         if (authHelper.isLoggedIn()) {
@@ -291,9 +320,13 @@ class ModelEnvironment extends Component {
                         />
                     </div>
                 </ul>
-
+                let errorMessage = this.state.hasError ? <div>
+                    <p>Error: {this.state.error}</p>
+                    <p>Reason: {this.state.errorReason}</p>
+                    <p>Suggestion: {this.state.errorSuggestion}</p>
+                </div> : <div></div>;
                 renderBody = <div>
-                    <ModelManagementMenu model_id={modelId}>
+                    <ModelManagementMenu model={this.state.model}>
                         <Card>
                             <CardHeader title="Environment Variables">
                             </CardHeader>
@@ -304,6 +337,7 @@ class ModelEnvironment extends Component {
                                     of a model.
                                 </p>
                                 {renderEnvironment}
+                                {errorMessage}
                             </CardBody>
                         </Card>
                     </ModelManagementMenu>
