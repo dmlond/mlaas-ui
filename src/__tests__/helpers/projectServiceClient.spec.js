@@ -219,15 +219,16 @@ describe('projectServiceClient', () => {
     });
 
     describe('.model', () => {
-      let expectedModelId = "abc-123-xyz";
-      let expectedProjectServicePath = '/api/v1/ai_models'+"/"+expectedModelId;
+      let expectedProjectName = "xyz-321-cba";
+      let expectedModelName = "abc-123-xyz";
+      let expectedProjectServicePath = '/api/v1/projects/'+expectedProjectName+'/ai_models/'+expectedModelName;
       let expectedProjectServiceSendMethod = 'get'
 
-      function subject(i, s,f) {
-          projectServiceClient.model(i, s,f);
+      function subject(pn,mn, s,f) {
+          projectServiceClient.model(pn,mn, s,f);
       }
 
-      testProjectServiceApi(expectedProjectServicePath, expectedProjectServiceSendMethod, subject, {}, expectedModelId);
+      testProjectServiceApi(expectedProjectServicePath, expectedProjectServiceSendMethod, subject, {}, expectedProjectName, expectedModelName);
     });
 
     describe('.updateModel', () => {
