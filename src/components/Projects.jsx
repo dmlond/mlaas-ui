@@ -16,11 +16,15 @@ class Projects extends Component {
         this.handleCloseNewProject = this.handleCloseNewProject.bind(this);
         this.handleProjectSubmission = this.handleProjectSubmission.bind(this);
         this.handleSuccessfulProjectCreation = this.handleSuccessfulProjectCreation.bind(this);
-
+        let urlParams = new URLSearchParams(window.location.search);
+        let newProjectClicked = false;
+        if (urlParams.get('create') === 'true') {
+            newProjectClicked = true;
+        }
         this.state = {
             isLoading: true,
             hasError: false,
-            newProjectClicked: false,
+            newProjectClicked: newProjectClicked,
             projects: []
         };
     }

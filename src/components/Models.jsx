@@ -168,7 +168,7 @@ class Models extends Component {
             >
                 <CardHeader title="You need to create a project before you can create a model" />
                 <CardBody>
-                    <Link to="/projects">Projects</Link>
+                    <Link to="/projects?create=true">Create Project</Link>
                 </CardBody>
             </Card>
         }
