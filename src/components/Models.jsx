@@ -58,7 +58,8 @@ class Models extends Component {
             this.setState({
                 userProjects: data
             });
-            this.loadModels(null);
+            let projectId = this.props.project ? this.props.project.id : null;
+            this.loadModels(projectId);
         }
     }
 
@@ -97,8 +98,8 @@ class Models extends Component {
         });
     }
 
-    handleModelSelection(modelId) {
-        window.location.assign(window.location.origin+'/models/'+modelId);
+    handleModelSelection(model) {
+        window.location.assign(window.location.origin+'/'+model.project_name+'/'+model.name);
     }
 
     handleNewModelClick(event) {
@@ -124,8 +125,12 @@ class Models extends Component {
         );
     }
 
-    handleSuccessfulModelCreation(data) {
-        const modelList = this.state.models.concat(data);
+    handleSuccessfulModelCreation(model) {
+        if (this.props.project && model.project_id != this.props.project.id) {
+            window.location.assign(window.location.origin+'/'+model.project_name)
+            return;
+        }
+        const modelList = this.state.models.concat(model);
         this.setState({
             newModelClicked: false,
             models: modelList
@@ -168,34 +173,47 @@ class Models extends Component {
             </Card>
         }
         else {  
-            let CancelToolTip = Tooltip(ActionButton);  
+            let CancelToolTip = Tooltip(ActionButton);
+
+            var renderProjectFilter;
+            var projectModelForm = <ModelForm
+                onCancel={this.handleCloseNewModel}
+                onSubmit={this.handleModelSubmission}
+                userProjects={this.state.userProjects}
+                selectedProjectId={this.props.project ? this.props.project.id : null}
+            />
+
+            if (this.props.project) {
+                renderProjectFilter = '';
+            }
+            else {
+                renderProjectFilter = <div style={{"display":"inline-flex"}}>
+                    <CancelToolTip
+                        onClick={this.clearProjectFilter}
+                        tooltip='Clear Project Filter'
+                    >
+                        <IconCancel/>
+                    </CancelToolTip>
+                    <Dropdown
+                        label="Filter by Project"
+                        labelKey="name"
+                        onChange={this.projectChange}
+                        source={this.state.userProjects}
+                        value={this.state.project_id}
+                        valueKey="id"
+                    />
+                </div>
+            }
             renderBody = <div>
                 <Modal
                     active={this.state.newModelClicked}
                     escKeyDown={this.handleCloseNewModel}
                 >
-                    <ModelForm
-                        onCancel={this.handleCloseNewModel}
-                        onSubmit={this.handleModelSubmission}
-                        userProjects={this.state.userProjects}
-                    />
+                    {projectModelForm}
                 </Modal>
                 <Card>
                     <CardHeader title="Models">
-                        <CancelToolTip
-                            onClick={this.clearProjectFilter}
-                            tooltip='Clear Project Filter'
-                        >
-                            <IconCancel/>
-                        </CancelToolTip>
-                        <Dropdown
-                            label="Filter by Project"
-                            labelKey="name"
-                            onChange={this.projectChange}
-                            source={this.state.userProjects}
-                            value={this.state.project_id}
-                            valueKey="id"
-                        />
+                        {renderProjectFilter}
                         <Button 
                             label="New Model" 
                             onClick={this.handleNewModelClick}
@@ -210,7 +228,7 @@ class Models extends Component {
                                         lineOne={model.name}
                                         lineTwo={model.description}
                                         clickable={true}
-                                        onClick={this.handleModelSelection.bind(this,model.id)}
+                                        onClick={this.handleModelSelection.bind(this,model)}
                                     />
                                 );                    
                             })} 

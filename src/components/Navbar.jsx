@@ -10,7 +10,14 @@ class Navbar extends Component {
     }
     render() {
         if (authHelper.isLoggedIn()){
-            let navigationMenu = <div style={{"display":"inline-flex", "margin":0,"padding": 0}}><Link to="/">Home </Link><div style={{"marginLeft":10}}><Link to="/projects">Projects</Link></div><div style={{"marginLeft":10}}></div><Link to="/models">Models</Link></div>
+            let navigationMenu = <div style={{"display":"inline-flex", "margin":0,"padding": 0}}>
+                <div style={{"display":"inline-flex"}}>
+                    <Link to="/">Models</Link>
+                </div>
+                <div style={{"marginLeft":10}}>
+                    <Link to="/projects">Projects</Link>
+                </div>
+            </div>
             return (
             <div>
                 <AppHeader

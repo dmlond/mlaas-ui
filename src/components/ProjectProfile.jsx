@@ -5,6 +5,7 @@ import projectServiceClient from '../helpers/projectServiceClient';
 import config from "../config/authconfig.js";
 import { Modal, Button, Spinner, Card, CardHeader, CardBody } from "@duke-office-research-informatics/dracs";
 import ProjectForm from './ProjectForm';
+import Models from './Models'
 
 class ProjectProfile extends Component {
     constructor(props) {
@@ -35,9 +36,9 @@ class ProjectProfile extends Component {
     }
 
     loadProject() {
-        let id = this.props.match.params.projectid;
+        let projectName = this.props.match.params.projectName;
         projectServiceClient.project(
-            id,
+            projectName,
             this.handleSuccessfulProjectLoad,
             this.handleFailedProjectLoad
         );
@@ -54,7 +55,9 @@ class ProjectProfile extends Component {
         this.setState({
             isLoading: false,
             hasError: true,
-            errorMessage: errorMessage
+            error: errorMessage.error,
+            errorReason: errorMessage.reason,
+            errorSuggestion: errorMessage.suggestion
         });
     }
 
@@ -90,7 +93,11 @@ class ProjectProfile extends Component {
 
     render() {
         var renderBody;
-        var loadError = this.state.hasError ? <p>Error Loading Project: {this.state.errorMessage}</p> : <div></div>;
+        let errorMessage = this.state.hasError ? <div>
+            <p>Error: {this.state.error}</p>
+            <p>Reason: {this.state.errorReason}</p>
+            <p>Suggestion: {this.state.errorSuggestion}</p>
+        </div> : <div></div>;
 
         if (authHelper.isLoggedIn()) {
             if (this.state.isLoading) {
@@ -115,9 +122,9 @@ class ProjectProfile extends Component {
                             />
                         </CardHeader>
                         <CardBody>
-                            <p>{ this.state.project.description }</p>
+                            <Models project={this.state.project } />
                         </CardBody>
-                        {loadError}
+                        {errorMessage}
                     </Card>
                 </div>
             }

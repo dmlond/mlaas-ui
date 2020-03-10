@@ -58,7 +58,7 @@ class Projects extends Component {
     }
 
     handleProjectSelection(projectid) {
-        window.location.assign(window.location.origin+'/projects/'+projectid);
+        window.location.assign(window.location.origin+'/'+projectid);
     }
 
     handleNewProjectClick(event) {
@@ -130,7 +130,7 @@ class Projects extends Component {
                                             lineOne={project.name}
                                             lineTwo={project.description}
                                             clickable={true}
-                                            onClick={this.handleProjectSelection.bind(this,project.id)}
+                                            onClick={this.handleProjectSelection.bind(this,project.name)}
                                         />
                                     );                    
                                 })} 

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import authHelper from '../helpers/authHelper';
+import Models from './Models'
 
 class Home extends Component {
     constructor(props) {
@@ -7,7 +8,7 @@ class Home extends Component {
       this.handleAuthenticationSuccess = this.handleAuthenticationSuccess.bind(this);
       this.handleException = this.handleException.bind(this);
       this.state = {
-        hasError: false
+        hasAuthError: false
       };
     }
 
@@ -26,38 +27,32 @@ class Home extends Component {
 
     handleException(errorMessage) {
       this.setState({
-        hasError: true,
+        hasAuthError: true,
         errorMessage: errorMessage});
     }
 
     render() {
       var renderBody;
 
+      let authErrorMessage = this.state.hasAuthError ? <div>
+      <p>Error: {this.state.error}</p>
+      <p>Reason: {this.state.errorReason}</p>
+      <p>Suggestion: {this.state.errorSuggestion}</p>
+      </div> : <div></div>;
+
       if (authHelper.isLoggedIn()) {
-        renderBody = <div className="App">
-            <p>
-              Welcome to ML@Duke!
-            </p>
-        </div>
+        renderBody = <Models />
       }
       else {
-        if (this.state.hasError) {
-          renderBody = <div className="App">
-                  <p>
-                    Problem Logging In { this.state.errorMessage }
-                  </p>
-              </div>
-        }
-        else {
-          renderBody = <div className="App">
-                <p>
-                  This is the Machine Learning @ Duke System. Please login to continue.
-                </p>
-            </div>
-        }
+        renderBody = <p>
+            This is the Machine Learning @ Duke System. Please login to continue.
+          </p>
       }
       return (
-        renderBody
+        <div>
+          {renderBody}
+          {authErrorMessage}
+        </div>
       )
     }
 }

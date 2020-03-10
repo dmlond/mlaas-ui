@@ -97,8 +97,8 @@ const projectServiceClient = {
         }
     },
 
-    model(modelId, successHandler, failureHandler) {
-        var modelProfileUrl = `${config.proxy_uri}/api/v1/ai_models/${modelId}`
+    model(projectName, modelName, successHandler, failureHandler) {
+        var modelProfileUrl = `${config.proxy_uri}/api/v1/projects/${projectName}/ai_models/${modelName}`
         this.send(
             {
                 url: modelProfileUrl,

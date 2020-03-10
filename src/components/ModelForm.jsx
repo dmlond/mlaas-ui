@@ -14,7 +14,17 @@ class ModelForm extends Component {
         this.handleSubmissionClick = this.handleSubmissionClick.bind(this);
         this.handleSubmissionError = this.handleSubmissionError.bind(this);
 
-        let modelProjectId = this.props.model ? this.props.model.project_id : '';
+        let modelProjectId;
+        if (this.props.model) { 
+            modelProjectId = this.props.model.project_id;
+        }
+        else if (this.props.selectedProjectId) {
+            modelProjectId = this.props.selectedProjectId;
+        } 
+        else {
+            modelProjectId = '';
+        }
+
         let modelName = this.props.model ? this.props.model.name : '';
         let modelDescription = this.props.model ? this.props.model.description: '';
         let gitRepositoryUrl = this.props.model ? this.props.model.git_repository_url: '';
@@ -159,16 +169,24 @@ class ModelForm extends Component {
 
     render() {
         let title = this.props.model ? "Edit Model" : "New Model";
-        let projectElement = this.props.model ? <h4>ProjectID: {this.props.model.project_id}</h4> :                         <Dropdown
-            label="Project ID"
-            required={true}
-            labelKey="name"
-            onChange={this.projectChange}
-            source={this.props.userProjects}
-            value={this.state.project_id}
-            valueKey="id"
-            allowBlank={false}
-        />
+        let projectElement;
+        
+        if (this.props.userProjects) {
+            projectElement = <Dropdown
+                label="Project ID"
+                required={true}
+                labelKey="name"
+                onChange={this.projectChange}
+                source={this.props.userProjects}
+                value={this.state.project_id}
+                valueKey="id"
+                allowBlank={false}
+            />
+        }
+        else {
+            projectElement = <h4>ProjectID: {this.props.model.project_id}</h4>
+        }
+
 
         let errorMessage = this.state.hasError ? <div>
             <p>Error: {this.state.error}</p>

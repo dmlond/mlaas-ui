@@ -6,6 +6,7 @@ import config from "../config/authconfig.js";
 import { Modal, Button, Spinner, Card, CardHeader, CardBody } from "@duke-office-research-informatics/dracs";
 import ModelForm from './ModelForm';
 import ModelManagementMenu from "./ModelManagementMenu";
+import CookieTrail from "./CookieTrail";
 
 class ModelProfile extends Component {
     constructor(props) {
@@ -36,9 +37,11 @@ class ModelProfile extends Component {
     }
 
     loadModel() {
-        let id = this.props.match.params.modelid;
+        let projectName = this.props.match.params.projectName;
+        let modelName = this.props.match.params.modelName;
         projectServiceClient.model(
-            id,
+            projectName,
+            modelName,
             this.handleSuccessfulModelLoad,
             this.handleFailedModelLoad
         );
@@ -115,6 +118,9 @@ class ModelProfile extends Component {
             if (this.state.isLoading) {
                 renderBody = <div><Spinner /></div>
             }
+            else if (this.state.hasError) {
+                renderBody = <div>{errorMessage}</div>
+            }
             else {
                 renderBody = <div>
                     <Modal
@@ -128,6 +134,7 @@ class ModelProfile extends Component {
                         />
                     </Modal>
                     <ModelManagementMenu model_id={this.state.model.id}>
+                        <CookieTrail />
                         <Card>
                             <CardHeader title={ this.state.model.name } >
                                 <Button 
@@ -137,7 +144,6 @@ class ModelProfile extends Component {
                             </CardHeader>
                             <CardBody>
                                 <p>{ this.state.model.description }</p>
-                                {errorMessage}
                             </CardBody>
                         </Card>
                     </ModelManagementMenu>
