@@ -168,16 +168,13 @@ class ModelSchedule extends Component {
                             <p><b>End Date:</b> {endDate}</p>
                         </li>
                         <li>
-                            <p><b>Retries:</b> {this.state.schedule.retries}</p>
+                            <p><b>Retries:</b> {this.state.schedule.retries ? this.state.schedule.retries : 0}</p>
                         </li>
                         <li>
-                            <p><b>Retry Delay:</b> {this.state.schedule.retry_delay}</p>
+                            <p><b>Retry Delay:</b> {this.state.schedule.retry_delay ? this.state.schedule.retry_delay : 0}</p>
                         </li>
                         <li>
-                            <p><b>Catchup?</b> {this.state.schedule.catchup ? 'true' : 'false'}</p>
-                        </li>
-                        <li>
-                            <p><b>Depends on Past?</b> {this.state.schedule.depends_on_past ? 'true' : 'false'}</p>
+                            <p><b>Stop future runs on failure?</b> {this.state.schedule.depends_on_past ? 'true' : 'false'}</p>
                         </li>
                     </ul>
                 }
@@ -199,22 +196,24 @@ class ModelSchedule extends Component {
                         />
                     </Modal>
                     <ModelManagementMenu model={this.state.model}>
-                        <CookieTrail />
-                        <Card
-                            height="40vw"
-                            width="70vw"
-                        >
-                            <CardHeader title="Schedule:" >
-                                <Button 
-                                    label={setScheduleButtonLabel} 
-                                    onClick={this.handleUpdateScheduleClick}
-                                />
-                            </CardHeader>
-                            <CardBody>
-                                {renderSchedule}
-                                {errorMessage}
-                            </CardBody>
-                        </Card>
+                        <div style={{"margin":"0 20px"}}>
+                            <CookieTrail />
+                            <Card
+                                height="40vw"
+                                width="70vw"
+                            >
+                                <CardHeader title="Schedule:" >
+                                    <Button 
+                                        label={setScheduleButtonLabel} 
+                                        onClick={this.handleUpdateScheduleClick}
+                                    />
+                                </CardHeader>
+                                <CardBody>
+                                    {renderSchedule}
+                                    {errorMessage}
+                                </CardBody>
+                            </Card>
+                        </div>
                     </ModelManagementMenu>
                 </div>
             }

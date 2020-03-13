@@ -2,10 +2,13 @@ import React, { Component } from 'react';
 import { Card, CardHeader, CardBody, Input, Checkbox, Button } from "@duke-office-research-informatics/dracs";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import CronBuilder from  'react-cron-builder';
+import 'react-cron-builder/dist/bundle.css';
 
 class ScheduleForm extends Component {
     constructor(props) {
         super(props);
+        this.toggleIntervalInputStyle = this.toggleIntervalInputStyle.bind(this);
         this.startDateChange = this.startDateChange.bind(this);
         this.endDateChange = this.endDateChange.bind(this);
         this.scheduleIntervalChange = this.scheduleIntervalChange.bind(this);
@@ -21,17 +24,18 @@ class ScheduleForm extends Component {
         let scheduleInterval = this.props.schedule ? this.props.schedule.schedule_interval : '';
         let retries = this.props.schedule ? this.props.schedule.retries : 0;
         let retryDelay = this.props.schedule ? this.props.schedule.retry_delay : 0;
-        let catchup = this.props.schedule ? this.props.schedule.catchup : false;
+        let catchup = this.props.schedule ? this.props.schedule.catchup : true;
         let dependsOnPast = this.props.schedule ? this.props.schedule.depends_on_past : false;
         this.state = {
             hasError: false,
             schedule_interval: scheduleInterval,
             start_date: modelStartDate ? new Date(modelStartDate) : null,
             end_date: modelEndDate ? new Date(modelEndDate) : null,
-            retries: retries,
-            retry_delay : retryDelay,
-            catchup: catchup,
-            depends_on_past: dependsOnPast
+            retries: retries ? retries : 0,
+            retry_delay : retryDelay ? retryDelay : 0,
+            catchup: catchup ? catchup : false,
+            depends_on_past: dependsOnPast ? dependsOnPast : false,
+            guiStyleClicked: false
         };
     }
 
@@ -44,6 +48,12 @@ class ScheduleForm extends Component {
     endDateChange(value) {
         this.setState({
             end_date: value
+        });
+    }
+
+    toggleIntervalInputStyle() {
+        this.setState({
+            guiStyleClicked: !this.state.guiStyleClicked
         });
     }
 
@@ -118,19 +128,37 @@ class ScheduleForm extends Component {
             <p>Reason: {this.state.errorReason}</p>
             <p>Suggestion: {this.state.errorSuggestion}</p>
         </div> : <div></div>;
-    
+        let intervalInputStyleButtonLabel, intervalInput;
+        if (this.state.guiStyleClicked) {
+            intervalInputStyleButtonLabel = 'Text';
+            intervalInput =  <CronBuilder
+                cronExpression={this.state.schedule_interval}
+                onChange={this.scheduleIntervalChange}
+                showResult={true}
+            />
+        } 
+        else {
+            intervalInputStyleButtonLabel = 'Graphical';
+            intervalInput =  <Input
+                name="schedule_interval"
+                onChange={this.scheduleIntervalChange}
+                value={this.state.schedule_interval}
+            />
+        }
         let renderBody = <Card
             height="40vw"
             width="90vw"
         >
             <CardHeader title={ title } />
             <CardBody>
-                <Input
-                    name="schedule_interval"
-                    labelText="Schedule Interval"
-                    onChange={this.scheduleIntervalChange}
-                    value={this.state.schedule_interval}
-                />
+                <div>
+                    <h4>Schedule Interval</h4>
+                    {intervalInput}
+                    <Button 
+                        onClick={this.toggleIntervalInputStyle}
+                        label={intervalInputStyleButtonLabel}
+                    />
+                </div>
                 <h4>Start Date</h4>
                 <DatePicker
                     selected={this.state.start_date}
@@ -149,30 +177,27 @@ class ScheduleForm extends Component {
                     timeCaption="time"
                     dateFormat="Pp"
                 />
-                <Input
+                <h4>Retries after failure</h4>
+                <input
                     name="retries"
-                    labelText="Number of Retries to Attempt"
+                    type="number"
+                    min={0}
                     onChange={this.retriesChange}
                     value={this.state.retries}
                 />
-                <Input
+                <h4>Delay before retry (in seconds)</h4>
+                <input
                     name="retry_delay"
-                    labelText="delay between retries (seconds)"
+                    type="number"
+                    min={0}
                     onChange={this.retryDelayChange}
                     value={this.state.retry_delay}
                 />
                 <Checkbox
-                    name="catchup"
-                    label="Attempt all intervals within the specified time range"
-                    onChange={this.catchupChange}
-                    checked={this.state.catchup}
-                    value={this.state.catchup}
-                />
-                <Checkbox
                     name="depends_on_past"
-                    label="Do not run attempt of previous attempt fails"
+                    label="Stop future runs on failure"
                     onChange={this.dependsOnPastChange}
-                    checked={this.state.depends_on_past}
+                    checked={this.state.depends_on_past ? this.state.depends_on_past : false}
                     value={this.state.depends_on_past}
                 />
                 {errorMessage}
